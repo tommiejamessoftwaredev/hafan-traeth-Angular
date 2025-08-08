@@ -1,0 +1,22 @@
+<div class="faq-widget">
+  <h2 class="faq-title">Frequently Asked Questions</h2>
+  <div class="faq-list">
+    <div class="faq-item" *ngFor="let faq of faqs; let i = index">
+      <button 
+        class="faq-question" 
+        (click)="toggleFAQ(i)"
+        [attr.aria-expanded]="faq.isOpen">
+        <span>{{ faq.question }}</span>
+        <i 
+          class="fas fa-chevron-down faq-icon" 
+          [class.rotated]="faq.isOpen">
+        </i>
+      </button>
+      <div class="faq-answer" [class.open]="faq.isOpen">
+        <div class="faq-answer-content">
+          {{ faq.answer }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,84 @@
+<div class="gallery-widget">
+  <div class="gallery-header">
+    <h3>Property Gallery</h3>
+    <p>Take a virtual tour of Hafan Traeth</p>
+  </div>
+  
+  <div class="gallery-main">
+    <!-- Main featured image -->
+    <div class="featured-image" *ngIf="selectedImage">
+      <img 
+        [src]="selectedImage.url" 
+        [alt]="selectedImage.alt"
+        class="main-image"
+        (click)="openLightbox(selectedImage)">
+      <div class="image-info">
+        <h4>{{ selectedImage.title }}</h4>
+        <p>{{ selectedImage.description }}</p>
+      </div>
+      <button class="fullscreen-btn" (click)="openLightbox(selectedImage)">
+        🔍 View Full Size
+      </button>
+    </div>
+  </div>
+  
+  <div class="gallery-thumbnails">
+    <div class="thumbnail-grid">
+      <div 
+        *ngFor="let image of galleryImages; let i = index"
+        class="thumbnail"
+        [class.active]="image === selectedImage"
+        (click)="selectImage(image)">
+        <img 
+          [src]="image.thumbnail" 
+          [alt]="image.alt"
+          loading="lazy">
+        <div class="thumbnail-overlay">
+          <span class="thumbnail-title">{{ image.title }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="gallery-categories">
+    <h4>Browse by Category</h4>
+    <div class="category-filters">
+      <button 
+        *ngFor="let category of categories"
+        class="category-btn"
+        [class.active]="selectedCategory === category.key"
+        (click)="filterByCategory(category.key)">
+        {{ category.icon }} {{ category.name }} ({{ category.count }})
+      </button>
+    </div>
+  </div>
+  
+  <!-- Lightbox Modal -->
+  <div class="lightbox-overlay" *ngIf="lightboxImage" (click)="closeLightbox()">
+    <div class="lightbox-content" (click)="$event.stopPropagation()">
+      <button class="lightbox-close" (click)="closeLightbox()">×</button>
+      
+      <div class="lightbox-image-container">
+        <img 
+          [src]="lightboxImage.url" 
+          [alt]="lightboxImage.alt"
+          class="lightbox-image">
+      </div>
+      
+      <div class="lightbox-info">
+        <h3>{{ lightboxImage.title }}</h3>
+        <p>{{ lightboxImage.description }}</p>
+      </div>
+      
+      <div class="lightbox-navigation">
+        <button class="nav-btn prev-btn" (click)="previousImage()" [disabled]="currentImageIndex === 0">
+          ← Previous
+        </button>
+        <span class="image-counter">{{ currentImageIndex + 1 }} / {{ filteredImages.length }}</span>
+        <button class="nav-btn next-btn" (click)="nextImage()" [disabled]="currentImageIndex === filteredImages.length - 1">
+          Next →
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

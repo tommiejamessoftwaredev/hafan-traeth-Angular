@@ -1,0 +1,9 @@
+<div class="amenities-widget">
+  <h2 class="amenities-title">Amenities</h2>
+  <div class="amenities-grid">
+    <div class="amenity-item" *ngFor="let amenity of amenities">
+      <i class="amenity-icon" [ngClass]="amenity.icon"></i>
+      <span class="amenity-name">{{ amenity.name }}</span>
+    </div>
+  </div>
+</div>

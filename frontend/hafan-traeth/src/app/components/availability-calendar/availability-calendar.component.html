@@ -1,0 +1,79 @@
+<div class="calendar-widget">
+  <div class="calendar-header">
+    <h3>Check Availability</h3>
+    <p>Select your dates to check availability and prices</p>
+  </div>
+  
+  <div class="date-selection">
+    <div class="date-input-group">
+      <label for="checkin">Check-in Date</label>
+      <input 
+        type="date" 
+        id="checkin" 
+        [(ngModel)]="checkinDate"
+        [min]="minDate"
+        (change)="onDateChange()"
+        class="date-input">
+    </div>
+    
+    <div class="date-input-group">
+      <label for="checkout">Check-out Date</label>
+      <input 
+        type="date" 
+        id="checkout" 
+        [(ngModel)]="checkoutDate"
+        [min]="checkinDate || minDate"
+        (change)="onDateChange()"
+        class="date-input">
+    </div>
+  </div>
+  
+  <div class="calendar-display" *ngIf="showCalendar">
+    <div class="calendar-month">
+      <div class="calendar-nav">
+        <button (click)="previousMonth()" class="nav-btn">&lt;</button>
+        <h4>{{ currentMonth }} {{ currentYear }}</h4>
+        <button (click)="nextMonth()" class="nav-btn">&gt;</button>
+      </div>
+      
+      <div class="calendar-grid">
+        <div class="day-header" *ngFor="let day of dayHeaders">{{ day }}</div>
+        <div 
+          *ngFor="let day of calendarDays" 
+          class="calendar-day"
+          [ngClass]="{
+            'available': day.available,
+            'unavailable': !day.available && day.date,
+            'selected': day.selected,
+            'today': day.isToday,
+            'empty': !day.date,
+            'check-in': day.isCheckIn,
+            'check-out': day.isCheckOut,
+            'in-range': day.isInRange
+          }"
+          (click)="selectDate(day)">
+          {{ day.date?.getDate() }}
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="availability-result" *ngIf="availabilityChecked">
+    <div class="availability-status" [ngClass]="availabilityStatus">
+      <h4>{{ getAvailabilityMessage() }}</h4>
+    </div>
+    
+    <div class="booking-links" *ngIf="availabilityStatus === 'available'">
+      <h5>Book through our trusted partners:</h5>
+      <div class="booking-buttons">
+        <button (click)="bookOnBookingCom()" class="booking-btn booking-com" [disabled]="!checkinDate || !checkoutDate">
+          <span>Book on Booking.com</span>
+        </button>
+        <button (click)="bookOnAirbnb()" class="booking-btn airbnb" [disabled]="!checkinDate || !checkoutDate">
+          <span>Book on Airbnb</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+</div>

@@ -1,0 +1,67 @@
+<div class="hafan-traeth-app">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-video-container">
+      <video autoplay muted loop playsinline preload="auto" class="hero-video">
+        <source src="BackdropVideo.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+      <div class="hero-overlay">
+        <div class="hero-content" [class.fade-out]="!heroTitleVisible">
+          <h1>Hafan Traeth</h1>
+          <p>Your perfect coastal retreat in Wales</p>
+          <button class="cta-button" (click)="scrollToAvailability()">Check Availability</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Availability Calendar Section -->
+  <section class="availability-section" id="availability">
+    <div class="container">
+      <div class="calendar-container">
+        <app-availability-calendar></app-availability-calendar>
+      </div>
+    </div>
+  </section>
+
+  <!-- Location Map Section -->
+  <section class="location-section">
+    <div class="container">
+      <div class="map-container">
+        <app-google-map></app-google-map>
+      </div>
+    </div>
+  </section>
+
+  <!-- Gallery Section -->
+  <section class="gallery-section">
+    <div class="container">
+      <app-property-gallery></app-property-gallery>
+    </div>
+  </section>
+
+  <!-- Guest Reviews Section -->
+  <section class="reviews-section">
+    <div class="container">
+      <app-guest-reviews></app-guest-reviews>
+    </div>
+  </section>
+
+  <!-- Amenities Section -->
+  <section class="amenities-section">
+    <div class="container">
+      <app-amenities-list></app-amenities-list>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="faq-section">
+    <div class="container">
+      <app-faq-section></app-faq-section>
+    </div>
+  </section>
+</div>
+
+
+<router-outlet />

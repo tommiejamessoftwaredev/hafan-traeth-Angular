@@ -1,0 +1,68 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* Import Google Fonts - Luxury serif font */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap');
+
+/* Import Font Awesome */
+@import '@fortawesome/fontawesome-free/css/all.min.css';
+
+/* Global Color Variables */
+:root {
+  // Primary Brand Colors - Sunny Coastal Theme
+  --primary-blue: #1e90ff;  // Bright sky blue
+  --primary-teal: #20b2aa;  // Light sea green
+  --primary-gold: #ffd700;  // Sunny gold
+  --primary-gradient: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-teal) 100%);
+  
+  // Neutral Colors
+  --white: #ffffff;
+  --black: #000000;
+  --gray-50: #f8f9fa;
+  --gray-100: #f7fafc;
+  --gray-200: #edf2f7;
+  --gray-300: #e2e8f0;
+  --gray-400: #cbd5e0;
+  --gray-500: #a0aec0;
+  --gray-600: #718096;
+  --gray-700: #4a5568;
+  --gray-800: #2d3748;
+  --gray-900: #1a202c;
+  
+  // Text Colors
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --text-white: #ffffff;
+  
+  // Status Colors - Coastal Theme
+  --success-green: #00c851;  // Bright green
+  --error-red: #ff4444;      // Coral red  
+  --warning-orange: #ff8800; // Sunset orange
+  --info-blue: var(--primary-blue);
+  
+  // Background Colors
+  --bg-primary: var(--white);
+  --bg-secondary: var(--gray-50);
+  --bg-overlay: rgba(0, 0, 0, 0.2);
+  --bg-overlay-light: rgba(255, 255, 255, 0.1);
+  
+  // Border Colors
+  --border-light: var(--gray-200);
+  --border-medium: var(--gray-300);
+  --border-dark: var(--gray-400);
+  
+  // Shadow Colors
+  --shadow-light: rgba(0, 0, 0, 0.1);
+  --shadow-medium: rgba(0, 0, 0, 0.2);
+  --shadow-dark: rgba(0, 0, 0, 0.3);
+  --shadow-text: rgba(0, 0, 0, 0.7);
+  
+  // Component Specific - Coastal Theme
+  --calendar-highlight: rgba(30, 144, 255, 0.1);
+  --calendar-hover: rgba(30, 144, 255, 0.2);
+  --calendar-selected: var(--primary-blue);
+  --calendar-day-header: #abd9ff;  
+  --calendar-unavailable: #ffcccb;  // Light coral
+  --calendar-unavailable-text: var(--error-red);
+  --reviews-gradient: linear-gradient(135deg, var(--primary-teal) 0%, #4682b4 100%);  // Ocean blue gradient
+}

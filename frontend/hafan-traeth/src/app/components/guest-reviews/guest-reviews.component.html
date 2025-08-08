@@ -1,0 +1,65 @@
+<div class="reviews-widget">
+  <!-- Overall Rating Header -->
+  <div class="reviews-header">
+    <h2>What Our Guests Say</h2>
+    <div class="overall-rating">
+      <div class="rating-score">
+        <span class="score">{{ overallRating.toFixed(1) }}</span>
+        <div class="stars">
+          <i class="star" *ngFor="let star of getStarsArray(overallRating)" [ngClass]="[star.class, star.icon]"></i>
+        </div>
+        <span class="rating-text">Exceptional</span>
+      </div>
+      <p class="review-count">Based on {{ reviews.length }} reviews</p>
+    </div>
+  </div>
+
+  <!-- Simple Review Cards -->
+  <div class="reviews-grid">
+    <div class="review-card" *ngFor="let review of reviews">
+      <div class="review-header">
+        <div class="reviewer-info">
+          <div class="avatar">{{ getInitials(review.name) }}</div>
+          <div class="reviewer-details">
+            <h4>{{ review.name }}</h4>
+            <p class="location">{{ review.location }}</p>
+            <p class="date">{{ formatDate(review.date) }}</p>
+          </div>
+        </div>
+        <div class="rating">
+          <div class="stars">
+            <i class="star" *ngFor="let star of getStarsArray(review.rating)" [ngClass]="[star.class, star.icon]"></i>
+          </div>
+          <span class="rating-number">{{ review.rating.toFixed(1) }}</span>
+        </div>
+      </div>
+      
+      <div class="review-content">
+        <h5 class="review-title">{{ review.title }}</h5>
+        <p class="review-text">{{ review.text }}</p>
+      </div>
+      
+      <div class="review-highlights" *ngIf="review.highlights?.length">
+        <span class="highlight" *ngFor="let highlight of review.highlights">
+          <i [ngClass]="highlight.icon"></i>
+          {{ highlight.text }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- External Review Links -->
+  <div class="external-links">
+    <h3>Read More Reviews</h3>
+    <div class="platform-links">
+      <a [href]="bookingComReviewsUrl" target="_blank" class="platform-link booking">
+        <i class="fas fa-external-link-alt"></i>
+        <span>Booking.com Reviews</span>
+      </a>
+      <a [href]="airbnbReviewsUrl" target="_blank" class="platform-link airbnb">
+        <i class="fas fa-external-link-alt"></i>
+        <span>Airbnb Reviews</span>
+      </a>
+    </div>
+  </div>
+</div>
