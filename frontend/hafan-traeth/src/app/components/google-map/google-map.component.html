@@ -17,34 +17,17 @@
         (mapInitialized)="onMapReady()"
         (mapError)="onMapError($event)">
         
+        <!-- BnB Marker (hidden when showing directions since we have custom markers) -->
         <map-marker 
+          *ngIf="!showingDirections"
           [position]="markerPosition"
           [options]="markerOptions"
           title="Hafan Traeth - Your Coastal Retreat">
         </map-marker>
         
-        <!-- Beach Marker (only when showing directions) -->
-        <map-marker 
-          *ngIf="showingDirections"
-          [position]="getBeachLocation()"
-          title="Ffrith Beach - Your destination">
-        </map-marker>
-        
-        <!-- Shop Markers -->
+        <!-- Shopping Area Highlight (invisible overlay to show area) -->
         <ng-container *ngIf="showingShops">
-          <map-marker 
-            *ngFor="let shop of localShops; trackBy: trackByShopName"
-            [position]="shop.location"
-            [title]="shop.name + ' - ' + shop.type">
-            
-            <map-info-window>
-              <div class="shop-info-content">
-                <h4>🏪 {{ shop.name }}</h4>
-                <p><strong>{{ shop.type }}</strong></p>
-                <p>{{ shop.description }}</p>
-              </div>
-            </map-info-window>
-          </map-marker>
+          <!-- We'll just adjust the map view and let Google Maps show its own business markers -->
         </ng-container>
         
         <map-info-window>
@@ -82,7 +65,7 @@
   <div class="location-features">
     <div class="feature-grid">
       <div class="feature-item clickable" [class.active]="showingDirections" (click)="showBeachDirections()">
-        <span class="icon">🏖️</span>
+        <span class="icon"><i class="fas fa-umbrella-beach"></i></span>
         <div class="feature-text">
           <h5>Beach Access</h5>
           <p>5 minute walk to Ffrith Beach</p>
@@ -91,7 +74,7 @@
       </div>
       
       <div class="feature-item">
-        <span class="icon">🚗</span>
+        <span class="icon"><i class="fas fa-car"></i></span>
         <div class="feature-text">
           <h5>Parking</h5>
           <p>Free on-site parking available</p>
@@ -99,16 +82,16 @@
       </div>
       
       <div class="feature-item clickable" [class.active]="showingShops" (click)="showLocalShops()">
-        <span class="icon">🏪</span>
+        <span class="icon"><i class="fas fa-shopping-cart"></i></span>
         <div class="feature-text">
           <h5>Local Shops</h5>
-          <p>Prestatyn town center nearby</p>
-          <small class="directions-hint">{{ showingShops ? 'Click to hide shops' : 'Click to show local shops' }}</small>
+          <p>Supermarkets and stores nearby</p>
+          <small class="directions-hint">{{ showingShops ? 'Click to hide shopping area' : 'Click to show shopping area' }}</small>
         </div>
       </div>
       
       <div class="feature-item">
-        <span class="icon">🚌</span>
+        <span class="icon"><i class="fas fa-bus"></i></span>
         <div class="feature-text">
           <h5>Public Transport</h5>
           <p>Bus routes to Rhyl and Chester</p>
@@ -121,19 +104,19 @@
     <h4>Getting Here</h4>
     <div class="transport-options">
       <div class="transport-option">
-        <strong>🚗 By Car:</strong>
+        <strong><i class="fas fa-car"></i> By Car:</strong>
         <p>From Chester: 45 minutes via A55<br>
            From Manchester: 1.5 hours via A55</p>
       </div>
       
       <div class="transport-option">
-        <strong>🚂 By Train:</strong>
+        <strong><i class="fas fa-train"></i> By Train:</strong>
         <p>Prestatyn Railway Station: 1 mile<br>
            Direct services from Chester & Holyhead</p>
       </div>
       
       <div class="transport-option">
-        <strong>✈️ By Air:</strong>
+        <strong><i class="fas fa-plane"></i> By Air:</strong>
         <p>Liverpool Airport: 1 hour<br>
            Manchester Airport: 1.5 hours</p>
       </div>
@@ -141,10 +124,11 @@
     
     <div class="action-buttons">
       <button class="directions-btn" (click)="openDirections()">
-        📍 Get Directions
+        <i class="fas fa-route"></i> Get Directions
       </button>
       <button class="satellite-btn" (click)="toggleMapType()">
-        🛰️ {{ mapType === 'roadmap' ? 'Satellite View' : 'Road View' }}
+        <i class="fas {{ mapType === 'roadmap' ? 'fa-satellite-dish' : 'fa-road' }}"></i> 
+        {{ mapType === 'roadmap' ? 'Satellite View' : 'Road View' }}
       </button>
     </div>
   </div>

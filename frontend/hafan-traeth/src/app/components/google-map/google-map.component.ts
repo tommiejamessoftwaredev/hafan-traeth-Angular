@@ -21,30 +21,14 @@ export class GoogleMapComponent implements OnInit {
   // Directions
   directionsService: google.maps.DirectionsService | null = null;
   directionsRenderer: google.maps.DirectionsRenderer | null = null;
+  directionsMarkers: google.maps.Marker[] = [];
+  directionsInfoWindow: google.maps.InfoWindow | null = null;
+  shopsMarkers: google.maps.Marker[] = [];
+  shopsInfoWindows: google.maps.InfoWindow[] = [];
   
   // Map configuration
   center: google.maps.LatLngLiteral = { lat: 53.33336569521891, lng: -3.431334999915092 };
   zoom = 15;
-  
-  mapOptions: google.maps.MapOptions = {
-    mapTypeId: 'roadmap',
-    styles: [
-      {
-        featureType: 'water',
-        elementType: 'geometry',
-        stylers: [{ color: '#667eea' }]
-      },
-      {
-        featureType: 'landscape',
-        elementType: 'geometry',
-        stylers: [{ color: '#f5f5f5' }]
-      }
-    ],
-    mapTypeControl: true,
-    streetViewControl: true,
-    fullscreenControl: true,
-    zoomControl: true
-  };
   
   // Marker configuration
   markerOptions: google.maps.MarkerOptions = {
@@ -59,36 +43,92 @@ export class GoogleMapComponent implements OnInit {
     lng: -3.432135755118875
   };
   
-  // Local shops and amenities
+  // Specific shops with exact coordinates
   localShops = [
     {
-      name: 'Tesco Prestatyn',
-      location: { lat: 53.3356, lng: -3.4254 },
-      type: 'Supermarket',
-      description: 'Large supermarket with groceries and essentials'
+      name: 'Spar',
+      location: { lat: 53.33498801660247, lng: -3.427581293313341 },
+      type: 'convenience_store',
+      description: 'Spar convenience store on Victoria Road'
     },
     {
-      name: 'Prestatyn High Street',
-      location: { lat: 53.3339, lng: -3.4089 },
-      type: 'Shopping Street',
-      description: 'Main shopping area with various shops and cafes'
+      name: 'Co-op',
+      location: { lat: 53.33661637351705, lng: -3.4157436514852186 },
+      type: 'grocery_or_supermarket',
+      description: 'Co-operative Food store on Victoria Road'
     },
     {
-      name: 'Spar Express',
-      location: { lat: 53.3314, lng: -3.4331 },
-      type: 'Convenience Store',
-      description: 'Local convenience store for daily essentials'
+      name: 'Tesco',
+      location: { lat: 53.33673759602825, lng: -3.401879530165172 },
+      type: 'grocery_or_supermarket',
+      description: 'Large Tesco superstore'
     },
     {
-      name: 'Prestatyn Town Centre',
-      location: { lat: 53.3342, lng: -3.4087 },
-      type: 'Shopping Center',
-      description: 'Town center with shops, restaurants, and services'
+      name: 'Home Bargains',
+      location: { lat: 53.33540812533078, lng: -3.408008607890734 },
+      type: 'store',
+      description: 'Home Bargains discount store'
+    },
+    {
+      name: 'Lidl',
+      location: { lat: 53.33429370519122, lng: -3.405421421372873 },
+      type: 'grocery_or_supermarket',
+      description: 'Lidl supermarket'
+    },
+    {
+      name: 'Aldi',
+      location: { lat: 53.33097772063083, lng: -3.4028241117530307 },
+      type: 'grocery_or_supermarket',
+      description: 'Aldi supermarket at the top of town'
     }
   ];
   
-  shopMarkers: any[] = [];
+  // Map styles to hide all POIs when showing custom shop markers
+  private readonly groceryStoreMapStyle = [
+    // Hide all POI labels so we can show our custom shop markers
+    {
+      featureType: 'poi',
+      stylers: [{ visibility: 'off' }]
+    },
+    // Keep natural terrain colors and styling
+    {
+      featureType: 'landscape',
+      elementType: 'geometry',
+      stylers: [{ color: '#ffffffff' }]
+    },
+    {
+      featureType: 'road',
+      stylers: [{ visibility: 'simplified' }]
+    },
+    {
+      featureType: 'administrative',
+      elementType: 'labels',
+      stylers: [{ visibility: 'on' }]
+    }
+  ];
   
+  private readonly defaultMapStyle = [
+    {
+      featureType: 'water',
+      elementType: 'geometry',
+      stylers: [{ color: '#5e7bffff' }]
+    },
+    {
+      featureType: 'landscape',
+      elementType: 'geometry',
+      stylers: [{ color: '#ffffffff' }]
+    }
+  ];
+  
+  mapOptions: google.maps.MapOptions = {
+    mapTypeId: 'roadmap',
+    styles: this.defaultMapStyle,
+    mapTypeControl: true,
+    streetViewControl: true,
+    fullscreenControl: true,
+    zoomControl: true
+  };
+
   constructor() {}
   
   ngOnInit() {
@@ -100,7 +140,7 @@ export class GoogleMapComponent implements OnInit {
     // Check if we have a valid API key
     const apiKey = environment.googleMapsApiKey;
     
-    if (!apiKey || apiKey === 'YOUR_API_KEY_HERE' || apiKey === 'AIzaSyA3C3Cg71Y7H5wIb2vC1PZU7K31xuvS2FY') {
+    if (!apiKey ) {
       console.warn('Google Maps API key not configured or using example key. Showing fallback map.');
       this.showFallback = true;
       this.mapLoaded = true;
@@ -138,7 +178,12 @@ export class GoogleMapComponent implements OnInit {
       this.directionsService = new window.google.maps.DirectionsService();
       this.directionsRenderer = new window.google.maps.DirectionsRenderer({
         draggable: false,
-        suppressMarkers: false
+        suppressMarkers: true, // We'll add custom markers
+        polylineOptions: {
+          strokeColor: '#4285F4',
+          strokeWeight: 5,
+          strokeOpacity: 0.8
+        }
       });
       
       if (this.map && this.map.googleMap) {
@@ -158,9 +203,8 @@ export class GoogleMapComponent implements OnInit {
   }
   
   openDirections() {
-    const destination = `${this.markerPosition.lat},${this.markerPosition.lng}`;
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${destination}`;
-    window.open(url, '_blank');
+    // Use embedded map directions instead of opening new tab
+    this.showBeachDirections();
   }
   
   showBeachDirections() {
@@ -170,8 +214,14 @@ export class GoogleMapComponent implements OnInit {
       return;
     }
     
+    console.log('showBeachDirections called');
+    console.log('showFallback:', this.showFallback);
+    console.log('directionsService:', this.directionsService);
+    console.log('directionsRenderer:', this.directionsRenderer);
+    
     if (this.showFallback) {
       // Fallback to external link if Google Maps not loaded
+      console.log('Using fallback - opening external link');
       this.openBeachDirectionsExternal();
       return;
     }
@@ -179,9 +229,27 @@ export class GoogleMapComponent implements OnInit {
     this.clearShops();
     
     if (!this.directionsService || !this.directionsRenderer) {
-      console.error('Directions service not initialized');
-      this.openBeachDirectionsExternal();
-      return;
+      console.error('Directions service not initialized - trying to initialize now');
+      
+      // Try to initialize directions service if not already done
+      if (window.google && window.google.maps && this.map && this.map.googleMap) {
+        console.log('Attempting to initialize directions service');
+        this.directionsService = new window.google.maps.DirectionsService();
+        this.directionsRenderer = new window.google.maps.DirectionsRenderer({
+          draggable: false,
+          suppressMarkers: true,
+          polylineOptions: {
+            strokeColor: '#4285F4',
+            strokeWeight: 5,
+            strokeOpacity: 0.8
+          }
+        });
+        this.directionsRenderer.setMap(this.map.googleMap);
+      } else {
+        console.error('Google Maps API or map not available');
+        this.openBeachDirectionsExternal();
+        return;
+      }
     }
     
     const request: google.maps.DirectionsRequest = {
@@ -190,15 +258,98 @@ export class GoogleMapComponent implements OnInit {
       travelMode: google.maps.TravelMode.WALKING
     };
 
-    this.directionsService.route(request, (result, status) => {
+    this.directionsService!.route(request, (result, status) => {
       if (status === 'OK' && result && this.directionsRenderer) {
+        console.log('Directions request successful - showing on embedded map');
+        
         this.directionsRenderer.setDirections(result);
         this.showingDirections = true;
         
-        console.log('Walking directions loaded successfully on embedded map');
+        // Make sure the directions renderer is properly attached to the map
+        if (this.map && this.map.googleMap) {
+          this.directionsRenderer.setMap(this.map.googleMap);
+        }
         
-        // Adjust zoom to show the route better  
-        this.zoom = 16;
+        // Add custom markers with info windows
+        if (result.routes && result.routes.length > 0 && this.map && this.map.googleMap) {
+          const route = result.routes[0];
+          const leg = route.legs[0];
+          
+          // Create custom start marker (Hafan Traeth)
+          const startMarker = new google.maps.Marker({
+            position: leg.start_location,
+            map: this.map.googleMap,
+            title: 'Hafan Traeth',
+            icon: {
+              url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                <svg xmlns="http://www.w3.org/2000/svg" width="120" height="60" viewBox="0 0 120 60">
+                  <!-- Label background -->
+                  <rect x="10" y="5" width="100" height="20" rx="10" fill="white" stroke="#1a73e8" stroke-width="1"/>
+                  <!-- Label text -->
+                  <text x="60" y="18" text-anchor="middle" fill="#1a73e8" font-family="Arial, sans-serif" font-size="12" font-weight="bold">Hafan Traeth</text>
+                  <!-- Marker circle -->
+                  <circle cx="60" cy="45" r="12" fill="#4285F4" stroke="white" stroke-width="2"/>
+                  <!-- Marker text -->
+                  <text x="60" y="50" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="14" font-weight="bold">H</text>
+                </svg>
+              `),
+              scaledSize: new google.maps.Size(120, 60),
+              anchor: new google.maps.Point(60, 57)
+            }
+          });
+          
+          // Create custom end marker (Ffrith Beach)
+          const endMarker = new google.maps.Marker({
+            position: leg.end_location,
+            map: this.map.googleMap,
+            title: 'Ffrith Beach',
+            icon: {
+              url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                <svg xmlns="http://www.w3.org/2000/svg" width="120" height="60" viewBox="0 0 120 60">
+                  <!-- Label background -->
+                  <rect x="15" y="5" width="90" height="20" rx="10" fill="white" stroke="#34A853" stroke-width="1"/>
+                  <!-- Label text -->
+                  <text x="60" y="18" text-anchor="middle" fill="#34A853" font-family="Arial, sans-serif" font-size="12" font-weight="bold">Ffrith Beach</text>
+                  <!-- Marker circle -->
+                  <circle cx="60" cy="45" r="12" fill="#34A853" stroke="white" stroke-width="2"/>
+                  <!-- Marker text -->
+                  <text x="60" y="50" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="14" font-weight="bold">B</text>
+                </svg>
+              `),
+              scaledSize: new google.maps.Size(120, 60),
+              anchor: new google.maps.Point(60, 57)
+            }
+          });
+          
+          // Store markers for cleanup
+          this.directionsMarkers = [startMarker, endMarker];
+          
+          // Create info window with walking duration
+          const walkingTime = leg.duration?.text || 'Unknown duration';
+          const distance = leg.distance?.text || 'Unknown distance';
+          
+          this.directionsInfoWindow = new google.maps.InfoWindow({
+            content: `
+              <div style="padding: 10px; font-family: Arial, sans-serif;">
+                <h4 style="margin: 0 0 8px 0; color: #1a73e8;"><i class="fas fa-walking"></i> Walking Route</h4>
+                <p style="margin: 4px 0;"><strong>Duration:</strong> ${walkingTime}</p>
+                <p style="margin: 4px 0;"><strong>Distance:</strong> ${distance}</p>
+                <p style="margin: 8px 0 0 0; font-size: 12px; color: #666;">
+                  From Hafan Traeth to Ffrith Beach
+                </p>
+              </div>
+            `
+          });
+          
+          // Show info window on the start marker
+          this.directionsInfoWindow.open(this.map.googleMap, startMarker);
+          
+          // Adjust view to fit the route
+          const bounds = route.bounds;
+          if (bounds) {
+            this.map.googleMap.fitBounds(bounds);
+          }
+        }
       } else {
         console.error('Directions request failed due to ' + status);
         this.openBeachDirectionsExternal();
@@ -225,23 +376,114 @@ export class GoogleMapComponent implements OnInit {
     this.clearDirections();
     this.showingShops = true;
     
-    // Adjust zoom to show more area
-    this.zoom = 14;
+    // Apply styling to hide all POI labels
+    this.mapOptions = { ...this.mapOptions, styles: this.groceryStoreMapStyle };
     
-    // Center map to show both property and shops
-    this.center = { lat: 53.3334, lng: -3.4200 };
+    // Create custom markers for each shop
+    if (this.map && this.map.googleMap) {
+      this.localShops.forEach(shop => {
+        const labelWidth = shop.name.length * 8 + 20; // Approximate width based on text length
+        const marker = new google.maps.Marker({
+          position: shop.location,
+          map: this.map.googleMap,
+          title: shop.name,
+          icon: {
+            url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+              <svg xmlns="http://www.w3.org/2000/svg" width="${labelWidth + 10}" height="50" viewBox="0 0 ${labelWidth + 10} 50">
+                <!-- Label background -->
+                <rect x="5" y="5" width="${labelWidth}" height="18" rx="9" fill="white" stroke="#FF6B35" stroke-width="1"/>
+                <!-- Label text -->
+                <text x="${(labelWidth + 10) / 2}" y="16" text-anchor="middle" fill="#FF6B35" font-family="Arial, sans-serif" font-size="12" font-weight="bold">${shop.name}</text>
+                <!-- Marker circle -->
+                <circle cx="${(labelWidth + 10) / 2}" cy="37" r="10" fill="#FF6B35" stroke="white" stroke-width="2"/>
+                <!-- Marker text -->
+                <text x="${(labelWidth + 10) / 2}" y="41" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="12" font-weight="bold">S</text>
+              </svg>
+            `),
+            scaledSize: new google.maps.Size(labelWidth + 10, 50),
+            anchor: new google.maps.Point((labelWidth + 10) / 2, 47)
+          }
+        });
+        
+        // Add info window for each shop
+        const infoWindow = new google.maps.InfoWindow({
+          content: `
+            <div style="padding: 8px; font-family: Arial, sans-serif;">
+              <h4 style="margin: 0 0 4px 0; color: #FF6B35;">${shop.name}</h4>
+              <p style="margin: 0; font-size: 12px; color: #666;">${shop.description}</p>
+            </div>
+          `
+        });
+        
+        marker.addListener('click', () => {
+          // Close any open info windows
+          this.shopsInfoWindows.forEach(iw => iw.close());
+          infoWindow.open(this.map.googleMap, marker);
+        });
+        
+        this.shopsMarkers.push(marker);
+        this.shopsInfoWindows.push(infoWindow);
+      });
+    }
+    
+    // Calculate bounds that include BnB and all shops
+    const allLocations = [this.markerPosition, ...this.localShops.map(shop => shop.location)];
+    const latitudes = allLocations.map(loc => loc.lat);
+    const longitudes = allLocations.map(loc => loc.lng);
+    
+    const minLat = Math.min(...latitudes);
+    const maxLat = Math.max(...latitudes);
+    const minLng = Math.min(...longitudes);
+    const maxLng = Math.max(...longitudes);
+    
+    // Center between all locations
+    const centerLat = (minLat + maxLat) / 2;
+    const centerLng = (minLng + maxLng) / 2;
+    
+    this.center = { lat: centerLat, lng: centerLng };
+    
+    // Set appropriate zoom level to show all locations
+    this.zoom = 15;
   }
   
   clearDirections() {
+    // Clear the directions route
     if (this.directionsRenderer) {
       this.directionsRenderer.setDirections({ routes: [] } as any);
     }
+    
+    // Clear custom markers
+    this.directionsMarkers.forEach(marker => {
+      marker.setMap(null);
+    });
+    this.directionsMarkers = [];
+    
+    // Clear info window
+    if (this.directionsInfoWindow) {
+      this.directionsInfoWindow.close();
+      this.directionsInfoWindow = null;
+    }
+    
     this.showingDirections = false;
     this.resetMapView();
   }
   
   clearShops() {
+    // Clear custom shop markers
+    this.shopsMarkers.forEach(marker => {
+      marker.setMap(null);
+    });
+    this.shopsMarkers = [];
+    
+    // Close all shop info windows
+    this.shopsInfoWindows.forEach(infoWindow => {
+      infoWindow.close();
+    });
+    this.shopsInfoWindows = [];
+    
     this.showingShops = false;
+    // Reset map styling to default
+    this.mapOptions = { ...this.mapOptions, styles: this.defaultMapStyle };
     this.resetMapView();
   }
   
@@ -249,39 +491,13 @@ export class GoogleMapComponent implements OnInit {
     if (!this.showingDirections && !this.showingShops) {
       this.center = this.markerPosition;
       this.zoom = 15;
+      
+      // Also update the Google Map directly to ensure zoom reset
+      if (this.map && this.map.googleMap) {
+        this.map.googleMap.setCenter(this.markerPosition);
+        this.map.googleMap.setZoom(15);
+      }
     }
-  }
-  
-  trackByShopName(_index: number, shop: any): string {
-    return shop.name;
-  }
-  
-  getShopMarkerIcon(shopType: string): string {
-    let emoji = '🏪'; // Default shop emoji
-    
-    switch (shopType) {
-      case 'Supermarket':
-        emoji = '🛒';
-        break;
-      case 'Shopping Street':
-        emoji = '🛍️';
-        break;
-      case 'Convenience Store':
-        emoji = '🏪';
-        break;
-      case 'Shopping Center':
-        emoji = '🏬';
-        break;
-    }
-    
-    const svg = `
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="16" cy="16" r="14" fill="#ff5722" stroke="white" stroke-width="3"/>
-        <text x="16" y="22" text-anchor="middle" fill="white" font-size="14">${emoji}</text>
-      </svg>
-    `;
-    
-    return btoa(svg);
   }
   
   getBeachLocation(): google.maps.LatLngLiteral {
