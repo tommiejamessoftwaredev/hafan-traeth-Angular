@@ -1,13 +1,13 @@
 # Hafan Traeth - Holiday Property Website
 
-A modern, responsive Angular application showcasing a holiday property rental business in North Wales. This project demonstrates front-end development skills, interactive mapping functionality, and clean UI/UX design principles.
+A modern, responsive Angular application with a .net azure functions backend, showcasing a holiday property rental business in North Wales.
 
 ## Live Demo
 *[Add your deployed application URL here]*
 
 ## Project Overview
 
-**Hafan Traeth** is a sophisticated single-page application built for a coastal holiday rental property. The website provides guests with comprehensive information about the property, local attractions, and booking availability through an intuitive, visually appealing interface.
+**Hafan Traeth** is a single-page application built for a coastal holiday rental property. The website provides guests with comprehensive information about the property, local attractions, and booking availability through an intuitive, visually appealing interface.
 
 ### Key Features
 
@@ -114,6 +114,14 @@ The application is fully responsive across all device types:
 - **Environment Configuration** for different deployment stages
 - **External Link Integration** for booking and information services
 
+## TODO / Future Enhancements
+
+### Backend Integration
+- **Price Calculation API**: Integrate the existing Azure Functions backend for dynamic pricing
+  - Future: Connect availability calendar to Azure Functions for real-time pricing calculation
+  - API endpoints ready: `GetPricing`, `GetAvailability`, `CreateBooking`
+  - Located in: `/api/Functions/` (C# Azure Functions)
+
 ## Getting Started
 
 ### Prerequisites
@@ -149,30 +157,5 @@ ng build --prod
 npx http-server dist/hafan-traeth
 ```
 
-## Professional Showcase
-
-This project demonstrates proficiency in:
-
-### Technical Skills
-- **Modern Angular Development** with latest features and best practices
-- **Advanced TypeScript** usage with complex type definitions
-- **Google Maps API Integration** with custom functionality
-- **Responsive Web Design** with mobile-first approach
-- **SCSS/CSS Architecture** with maintainable, scalable styling
-- **Component-Based Architecture** with reusable, modular design
-
-### Problem-Solving Abilities
-- **Complex State Management** across multiple interactive components
-- **API Integration Challenges** with error handling and fallbacks
-- **Performance Optimization** for maps and media-rich content
-- **Cross-Browser Compatibility** solutions
-- **Accessibility Implementation** following web standards
-
-### Industry Best Practices
-- **Clean Code Principles** with maintainable, readable codebase
-- **Version Control** with meaningful commit messages
-- **Documentation** for future maintenance and collaboration
-- **Responsive Design** prioritizing user experience across devices
-- **SEO Considerations** with semantic HTML structure
 
 ---
