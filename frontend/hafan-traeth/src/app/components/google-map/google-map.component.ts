@@ -12,7 +12,6 @@ import { environment } from '../../../environments/environment';
 export class GoogleMapComponent implements OnInit {
   @ViewChild(GoogleMap) map!: GoogleMap;
   
-  // Make environment available in template
   environment = environment;
   
   mapLoaded = false;
@@ -25,7 +24,6 @@ export class GoogleMapComponent implements OnInit {
   selectedAttraction: { categoryIndex: number, attractionIndex: number } | null = null;
   transportFilter: 'all' | 'bus' | 'train' = 'all';
   
-  // Directions
   directionsService: google.maps.DirectionsService | null = null;
   directionsRenderer: google.maps.DirectionsRenderer | null = null;
   directionsMarkers: google.maps.Marker[] = [];
@@ -37,24 +35,20 @@ export class GoogleMapComponent implements OnInit {
   attractionsMarkers: google.maps.Marker[] = [];
   attractionsInfoWindows: google.maps.InfoWindow[] = [];
   
-  // Map configuration
   center: google.maps.LatLngLiteral = { lat: 53.33336569521891, lng: -3.431334999915092 };
   zoom = 15;
   
-  // Marker configuration
   markerOptions: google.maps.MarkerOptions = {
     draggable: false
   };
   
   markerPosition: google.maps.LatLngLiteral = { lat: 53.33336569521891, lng: -3.431334999915092 };
   
-  // Exact beach coordinates (Ffrith Beach)
   private readonly beachLocation = {
     lat: 53.33727314564057,
     lng: -3.432135755118875
   };
   
-  // Specific shops with exact coordinates
   localShops = [
     {
       name: 'Spar',
@@ -94,7 +88,6 @@ export class GoogleMapComponent implements OnInit {
     }
   ];
   
-  // Transport options with exact coordinates
   transportOptions = [
     {
       name: 'Prestatyn Railway Station',
@@ -144,7 +137,6 @@ export class GoogleMapComponent implements OnInit {
     }
   ];
 
-  // Local attractions organized by category
   attractionCategories = [
     {
       name: 'Castles & Historic Sites',
@@ -263,14 +255,11 @@ export class GoogleMapComponent implements OnInit {
     }
   ];
   
-  // Map styles to hide all POIs when showing custom shop markers
   private readonly groceryStoreMapStyle = [
-    // Hide all POI labels so we can show our custom shop markers
     {
       featureType: 'poi',
       stylers: [{ visibility: 'off' }]
     },
-    // Keep natural terrain colors and styling
     {
       featureType: 'landscape',
       elementType: 'geometry',
@@ -287,33 +276,16 @@ export class GoogleMapComponent implements OnInit {
     }
   ];
   
-  // Map styles for transport view
   private readonly transportMapStyle = [
-    // Hide all POI labels so we can show our custom transport markers
     {
       featureType: 'poi',
       stylers: [{ visibility: 'off' }]
     },
-    // Keep natural terrain colors and styling
-    // {
-    //   featureType: 'water',
-    //   elementType: 'geometry',
-    //   stylers: [{ color: '#667eea' }]
-    // },
     {
       featureType: 'landscape',
       elementType: 'geometry',
       stylers: [{ color: '#ffffffff' }]
-    },
-    // {
-    //   featureType: 'road',
-    //   stylers: [{ visibility: 'simplified' }]
-    // },
-    // {
-    //   featureType: 'administrative',
-    //   elementType: 'labels',
-    //   stylers: [{ visibility: 'on' }]
-    // }
+    }
   ];
   
   private readonly defaultMapStyle = [
@@ -341,12 +313,10 @@ export class GoogleMapComponent implements OnInit {
   constructor() {}
   
   ngOnInit() {
-    // Try to load Google Maps API
     this.loadGoogleMapsAPI();
   }
   
   private loadGoogleMapsAPI() {
-    // Check if we have a valid API key
     const apiKey = environment.googleMapsApiKey;
     
     if (!apiKey ) {
@@ -356,7 +326,6 @@ export class GoogleMapComponent implements OnInit {
       return;
     }
 
-    // Load Google Maps JavaScript API
     if (!document.querySelector('script[src*="maps.googleapis.com"]')) {
       const script = document.createElement('script');
       script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}`;
@@ -381,8 +350,6 @@ export class GoogleMapComponent implements OnInit {
   }
   
   onMapReady() {
-    console.log('Map is ready');
-    // Initialize directions service when map is ready
     if (window.google && window.google.maps) {
       this.directionsService = new window.google.maps.DirectionsService();
       this.directionsRenderer = new window.google.maps.DirectionsRenderer({
@@ -407,16 +374,13 @@ export class GoogleMapComponent implements OnInit {
   }
   
   onMapClick(event: google.maps.MapMouseEvent) {
-    // If an attraction is selected and user clicks on the map (not on a marker), deselect it
     if (this.selectedAttraction && this.showingAttractions) {
       this.selectedAttraction = null;
       
-      // Close all attraction info windows
       this.attractionsInfoWindows.forEach(infoWindow => {
         infoWindow.close();
       });
       
-      // Zoom back out to show all attractions
       this.adjustAttractionMapView();
     }
   }
@@ -427,7 +391,6 @@ export class GoogleMapComponent implements OnInit {
   }
   
   openDirections() {
-    // Open Google Maps with directions from user's current location to the property
     const destination = '10 Ceri Ave, Prestatyn LL19 7YN, UK';
     const url = `https://www.google.com/maps/dir//${encodeURIComponent(destination)}`;
     window.open(url, '_blank');
@@ -435,34 +398,23 @@ export class GoogleMapComponent implements OnInit {
   
   showBeachDirections() {
     if (this.showingDirections) {
-      // If already showing directions, clear them
-      this.clearDirections();
+        this.clearDirections();
       return;
     }
     
-    console.log('showBeachDirections called');
-    console.log('showFallback:', this.showFallback);
-    console.log('directionsService:', this.directionsService);
-    console.log('directionsRenderer:', this.directionsRenderer);
     
     if (this.showFallback) {
-      // Fallback to external link if Google Maps not loaded
-      console.log('Using fallback - opening external link');
       this.openBeachDirectionsExternal();
       return;
     }
 
-    // Clear other modes when showing beach directions (mutual exclusion)
     this.clearShops();
     this.clearTransport();
     this.clearAttractions();
     
     if (!this.directionsService || !this.directionsRenderer) {
-      console.error('Directions service not initialized - trying to initialize now');
       
-      // Try to initialize directions service if not already done
       if (window.google && window.google.maps && this.map && this.map.googleMap) {
-        console.log('Attempting to initialize directions service');
         this.directionsService = new window.google.maps.DirectionsService();
         this.directionsRenderer = new window.google.maps.DirectionsRenderer({
           draggable: false,
@@ -489,22 +441,18 @@ export class GoogleMapComponent implements OnInit {
 
     this.directionsService!.route(request, (result, status) => {
       if (status === 'OK' && result && this.directionsRenderer) {
-        console.log('Directions request successful - showing on embedded map');
         
         this.directionsRenderer.setDirections(result);
         this.showingDirections = true;
         
-        // Make sure the directions renderer is properly attached to the map
         if (this.map && this.map.googleMap) {
           this.directionsRenderer.setMap(this.map.googleMap);
         }
         
-        // Add custom markers with info windows
         if (result.routes && result.routes.length > 0 && this.map && this.map.googleMap) {
           const route = result.routes[0];
           const leg = route.legs[0];
           
-          // Create custom start marker (Hafan Traeth)
           const startMarker = new google.maps.Marker({
             position: leg.start_location,
             map: this.map.googleMap,
@@ -527,7 +475,6 @@ export class GoogleMapComponent implements OnInit {
             }
           });
           
-          // Create custom end marker (Ffrith Beach)
           const endMarker = new google.maps.Marker({
             position: leg.end_location,
             map: this.map.googleMap,
@@ -550,10 +497,8 @@ export class GoogleMapComponent implements OnInit {
             }
           });
           
-          // Store markers for cleanup
           this.directionsMarkers = [startMarker, endMarker];
           
-          // Create info window with walking duration
           const walkingTime = leg.duration?.text || 'Unknown duration';
           const distance = leg.distance?.text || 'Unknown distance';
           
@@ -570,17 +515,14 @@ export class GoogleMapComponent implements OnInit {
             `
           });
           
-          // Show info window on the start marker
           this.directionsInfoWindow.open(this.map.googleMap, startMarker);
           
-          // Adjust view to fit the route
           const bounds = route.bounds;
           if (bounds) {
             this.map.googleMap.fitBounds(bounds);
           }
         }
       } else {
-        console.error('Directions request failed due to ' + status);
         this.openBeachDirectionsExternal();
       }
     });
@@ -595,25 +537,21 @@ export class GoogleMapComponent implements OnInit {
   
   showLocalShops() {
     if (this.showingShops) {
-      // If already showing shops, clear them
-      this.clearShops();
+        this.clearShops();
       return;
     }
     
     if (this.showFallback) return;
     
-    // Clear other modes when showing shops (mutual exclusion)
     this.clearDirections();
     this.clearTransport();
     this.showingShops = true;
     
-    // Apply styling to hide all POI labels
     this.mapOptions = { ...this.mapOptions, styles: this.groceryStoreMapStyle };
     
-    // Create custom markers for each shop
     if (this.map && this.map.googleMap) {
       this.localShops.forEach(shop => {
-        const labelWidth = shop.name.length * 8 + 20; // Approximate width based on text length
+        const labelWidth = shop.name.length * 8 + 20;
         const marker = new google.maps.Marker({
           position: shop.location,
           map: this.map.googleMap,
@@ -636,7 +574,6 @@ export class GoogleMapComponent implements OnInit {
           }
         });
         
-        // Add info window for each shop
         const infoWindow = new google.maps.InfoWindow({
           content: `
             <div style="padding: 8px; font-family: Arial, sans-serif;">
@@ -647,7 +584,6 @@ export class GoogleMapComponent implements OnInit {
         });
         
         marker.addListener('click', () => {
-          // Close any open info windows
           this.shopsInfoWindows.forEach(iw => iw.close());
           infoWindow.open(this.map.googleMap, marker);
         });
@@ -657,7 +593,6 @@ export class GoogleMapComponent implements OnInit {
       });
     }
     
-    // Calculate bounds that include BnB and all shops
     const allLocations = [this.markerPosition, ...this.localShops.map(shop => shop.location)];
     const latitudes = allLocations.map(loc => loc.lat);
     const longitudes = allLocations.map(loc => loc.lng);
@@ -667,20 +602,17 @@ export class GoogleMapComponent implements OnInit {
     const minLng = Math.min(...longitudes);
     const maxLng = Math.max(...longitudes);
     
-    // Center between all locations
     const centerLat = (minLat + maxLat) / 2;
     const centerLng = (minLng + maxLng) / 2;
     
     this.center = { lat: centerLat, lng: centerLng };
     
-    // Set appropriate zoom level to show all locations
     this.zoom = 15;
   }
   
   showLocalTransport() {
     if (this.showingTransport) {
-      // If already showing transport, clear them
-      this.clearTransport();
+        this.clearTransport();
       return;
     }
     
@@ -692,10 +624,8 @@ export class GoogleMapComponent implements OnInit {
     this.showingTransport = true;
     this.transportFilter = 'all';
     
-    // Apply styling to hide all POI labels
     this.mapOptions = { ...this.mapOptions, styles: this.transportMapStyle };
     
-    // Create markers and adjust view
     this.createTransportMarkers();
     this.adjustMapView();
   }
@@ -710,13 +640,11 @@ export class GoogleMapComponent implements OnInit {
   }
   
   private clearTransportMarkers() {
-    // Clear custom transport markers
     this.transportMarkers.forEach(marker => {
       marker.setMap(null);
     });
     this.transportMarkers = [];
     
-    // Close all transport info windows
     this.transportInfoWindows.forEach(infoWindow => {
       infoWindow.close();
     });
@@ -759,7 +687,6 @@ export class GoogleMapComponent implements OnInit {
         }
       });
       
-      // Add info window for each transport option
       const linksHtml = transport.links?.map(link => 
         `<a href="${link.url}" target="${link.type === 'external' ? '_blank' : '_self'}" 
            style="display: inline-block; margin: 2px 4px 2px 0; padding: 4px 8px; 
@@ -780,7 +707,6 @@ export class GoogleMapComponent implements OnInit {
       });
       
       marker.addListener('click', () => {
-        // Close any open info windows
         this.transportInfoWindows.forEach(iw => iw.close());
         infoWindow.open(this.map.googleMap, marker);
       });
@@ -798,7 +724,6 @@ export class GoogleMapComponent implements OnInit {
       return false;
     });
 
-    // Calculate bounds that include BnB and filtered transport options
     const allLocations = [this.markerPosition, ...filteredTransport.map(transport => transport.location)];
     const latitudes = allLocations.map(loc => loc.lat);
     const longitudes = allLocations.map(loc => loc.lng);
@@ -808,13 +733,11 @@ export class GoogleMapComponent implements OnInit {
     const minLng = Math.min(...longitudes);
     const maxLng = Math.max(...longitudes);
     
-    // Center between all locations
     const centerLat = (minLat + maxLat) / 2;
     const centerLng = (minLng + maxLng) / 2;
     
     this.center = { lat: centerLat, lng: centerLng };
     
-    // Zoom in more for bus stops since they're close together
     this.zoom = this.transportFilter === 'bus' ? 17 : 15;
   }
   
@@ -822,24 +745,20 @@ export class GoogleMapComponent implements OnInit {
     this.clearTransportMarkers();
     this.showingTransport = false;
     this.transportFilter = 'all';
-    // Reset map styling to default
     this.mapOptions = { ...this.mapOptions, styles: this.defaultMapStyle };
     this.resetMapView();
   }
   
   clearDirections() {
-    // Clear the directions route
     if (this.directionsRenderer) {
       this.directionsRenderer.setDirections({ routes: [] } as any);
     }
     
-    // Clear custom markers
     this.directionsMarkers.forEach(marker => {
       marker.setMap(null);
     });
     this.directionsMarkers = [];
     
-    // Clear info window
     if (this.directionsInfoWindow) {
       this.directionsInfoWindow.close();
       this.directionsInfoWindow = null;
@@ -850,20 +769,17 @@ export class GoogleMapComponent implements OnInit {
   }
   
   clearShops() {
-    // Clear custom shop markers
     this.shopsMarkers.forEach(marker => {
       marker.setMap(null);
     });
     this.shopsMarkers = [];
     
-    // Close all shop info windows
     this.shopsInfoWindows.forEach(infoWindow => {
       infoWindow.close();
     });
     this.shopsInfoWindows = [];
     
     this.showingShops = false;
-    // Reset map styling to default
     this.mapOptions = { ...this.mapOptions, styles: this.defaultMapStyle };
     this.resetMapView();
   }
@@ -873,7 +789,6 @@ export class GoogleMapComponent implements OnInit {
       this.center = this.markerPosition;
       this.zoom = 15;
       
-      // Also update the Google Map directly to ensure zoom reset
       if (this.map && this.map.googleMap) {
         this.map.googleMap.setCenter(this.markerPosition);
         this.map.googleMap.setZoom(15);
@@ -883,21 +798,18 @@ export class GoogleMapComponent implements OnInit {
   
   showLocalAttractions() {
     if (this.showingAttractions) {
-      // If already showing attractions, clear them
-      this.clearAttractions();
+        this.clearAttractions();
       return;
     }
     
     if (this.showFallback) return;
     
-    // Clear other modes when showing attractions (mutual exclusion)
     this.clearDirections();
     this.clearShops();
     this.clearTransport();
     this.showingAttractions = true;
     this.selectedAttraction = null;
     
-    // Create markers for all attractions
     this.createAttractionMarkers();
     this.adjustAttractionMapView();
   }
@@ -933,7 +845,6 @@ export class GoogleMapComponent implements OnInit {
         }
       });
       
-      // Add info window for each attraction
       const infoWindow = new google.maps.InfoWindow({
         content: `
           <div style="padding: 8px; font-family: Arial, sans-serif; min-width: 200px;">
@@ -944,7 +855,6 @@ export class GoogleMapComponent implements OnInit {
       });
       
       marker.addListener('click', () => {
-        // Close any open info windows
         this.attractionsInfoWindows.forEach(iw => iw.close());
         infoWindow.open(this.map.googleMap, marker);
       });
@@ -957,7 +867,6 @@ export class GoogleMapComponent implements OnInit {
   private adjustAttractionMapView() {
     const allAttractions = this.attractionCategories.flatMap(category => category.attractions);
     
-    // Calculate bounds that include BnB and all attractions
     const allLocations = [this.markerPosition, ...allAttractions.map(attraction => attraction.location)];
     const latitudes = allLocations.map(loc => loc.lat);
     const longitudes = allLocations.map(loc => loc.lng);
@@ -967,22 +876,19 @@ export class GoogleMapComponent implements OnInit {
     const minLng = Math.min(...longitudes);
     const maxLng = Math.max(...longitudes);
     
-    // Center between all locations
     const centerLat = (minLat + maxLat) / 2;
     const centerLng = (minLng + maxLng) / 2;
     
     this.center = { lat: centerLat, lng: centerLng };
-    this.zoom = 11; // Zoom out to show all attractions
+    this.zoom = 11;
   }
   
   clearAttractions() {
-    // Clear custom attraction markers
     this.attractionsMarkers.forEach(marker => {
       marker.setMap(null);
     });
     this.attractionsMarkers = [];
     
-    // Close all attraction info windows
     this.attractionsInfoWindows.forEach(infoWindow => {
       infoWindow.close();
     });
@@ -999,7 +905,6 @@ export class GoogleMapComponent implements OnInit {
     
     const attraction = category.attractions[attractionIndex];
     
-    // If clicking the same attraction, unselect it and zoom back to all attractions
     if (this.selectedAttraction?.categoryIndex === categoryIndex && 
         this.selectedAttraction?.attractionIndex === attractionIndex) {
       this.selectedAttraction = null;
@@ -1007,26 +912,20 @@ export class GoogleMapComponent implements OnInit {
       return;
     }
     
-    // Select the new attraction
     this.selectedAttraction = { categoryIndex, attractionIndex };
     
-    // Zoom to the specific attraction
     this.center = attraction.location;
-    this.zoom = 16; // Close zoom for individual attractions
+    this.zoom = 16;
     
-    // Update Google Map directly
     this.map.googleMap.setCenter(attraction.location);
     this.map.googleMap.setZoom(16);
     
-    // Find and open the info window for this attraction
     const allAttractions = this.attractionCategories.flatMap(cat => cat.attractions);
     const globalAttractionIndex = this.attractionCategories.slice(0, categoryIndex)
       .reduce((sum, cat) => sum + cat.attractions.length, 0) + attractionIndex;
     
     if (this.attractionsInfoWindows[globalAttractionIndex]) {
-      // Close all other info windows
       this.attractionsInfoWindows.forEach(iw => iw.close());
-      // Open the selected attraction's info window
       this.attractionsInfoWindows[globalAttractionIndex].open(this.map.googleMap, this.attractionsMarkers[globalAttractionIndex]);
     }
   }
