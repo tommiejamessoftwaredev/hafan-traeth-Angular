@@ -21,6 +21,8 @@ export class GoogleMapComponent implements OnInit {
   showingDirections = false;
   showingShops = false;
   showingTransport = false;
+  showingAttractions = false;
+  selectedAttraction: { categoryIndex: number, attractionIndex: number } | null = null;
   transportFilter: 'all' | 'bus' | 'train' = 'all';
   
   // Directions
@@ -32,6 +34,8 @@ export class GoogleMapComponent implements OnInit {
   shopsInfoWindows: google.maps.InfoWindow[] = [];
   transportMarkers: google.maps.Marker[] = [];
   transportInfoWindows: google.maps.InfoWindow[] = [];
+  attractionsMarkers: google.maps.Marker[] = [];
+  attractionsInfoWindows: google.maps.InfoWindow[] = [];
   
   // Map configuration
   center: google.maps.LatLngLiteral = { lat: 53.33336569521891, lng: -3.431334999915092 };
@@ -135,6 +139,125 @@ export class GoogleMapComponent implements OnInit {
           text: 'Route 35 Journey Planner',
           url: environment.busRoute35PlannerUrl,
           type: 'external'
+        }
+      ]
+    }
+  ];
+
+  // Local attractions organized by category
+  attractionCategories = [
+    {
+      name: 'Castles & Historic Sites',
+      attractions: [
+        {
+          name: 'Rhuddlan Castle',
+          location: { lat: 53.28984747153027, lng: -3.46465229345647},
+          description: '13th-century castle ruins with rich Welsh history',
+          links: [{ url: 'https://cadw.gov.wales/visit/places-to-visit/rhuddlan-castle', text: 'Visit Info', icon: 'fas fa-external-link-alt' }]
+        },
+        {
+          name: 'Bodelwyddan Castle',
+          location: { lat: 53.26146141185901, lng: -3.502740685134114 },
+          description: 'Victorian castle with art galleries and parkland',
+          links: [{ url: 'https://www.bodelwyddan-castle.co.uk/', text: 'Official Site', icon: 'fas fa-external-link-alt' }]
+        },
+        {
+          name: 'Gwrych Castle',
+          location: { lat: 53.283126350431665, lng:-3.6071014498577987 },
+          description: 'Spectacular 19th-century castle, home to I\'m A Celebrity',
+          links: [{ url: 'https://gwryckcastle.co.uk/', text: 'Official Site', icon: 'fas fa-external-link-alt' }]
+        }
+      ]
+    },
+    {
+      name: 'Beaches',
+      attractions: [
+        {
+          name: 'Ffrith Beach',
+          location: { lat: 53.33596719394663, lng: -3.4381125994646626 },
+          description: 'Beautiful sandy beach, 5-minute walk from the property',
+          links: []
+        },
+        {
+          name: 'Barkby Beach',
+          location: { lat: 53.34501151962178, lng: -3.4021314919914016 },
+          description: 'Quiet sandy beach perfect for relaxation',
+          links: []
+        }
+      ]
+    },
+    {
+      name: 'Golf & Sports',
+      attractions: [
+        {
+          name: 'Prestatyn Golf Club',
+          location: { lat:   53.34359585248063, lng: -3.399578575590329},
+          description: '18-hole championship golf course',
+          links: [{ url: 'https://prestatatyngolfclub.co.uk/', text: 'Book Tee Time', icon: 'fas fa-golf-ball' }]
+        },
+        {
+          name: 'Crazy Golf',
+          location: { lat:  53.341409133712176, lng: -3.4119256381834266 },
+          description: 'Family-friendly mini golf course',
+          links: []
+        },
+        {
+          name: 'AstroBowl',
+          location: { lat: 53.3344759338221, lng: -3.4327660688154977 },
+          description: 'Traditional bowling green and club',
+          links: []
+        }
+      ]
+    },
+    {
+      name: 'Entertainment & Attractions',
+      attractions: [
+        {
+          name: 'Nova Leisure Centre',
+          location: { lat: 53.341928338627746, lng: -3.4130666523605555 },
+          description: 'Entertainment complex with cinema and restaurants',
+          links: []
+        },
+        { 
+          name: 'SC2 Rhyl',
+          location: { lat: 53.32061732066503, lng: -3.495869050296468 },
+          description: 'Large waterpark and leisure complex',
+          links: [{ url: 'https://www.sc2.wales/', text: 'Book Tickets', icon: 'fas fa-swimmer' }]
+        },
+        {
+          name: 'Scala Cinema',
+          location: { lat: 53.33535241551636, lng: -3.4047116610715236 },
+          description: 'Local cinema showing latest films',
+          links: []
+        },
+        {
+          name: 'Pavilion Theatre',
+          location: { lat: 53.32621110538621, lng: -3.4833133622145165 },
+          description: 'Historic theatre with live performances',
+          links: []
+        }
+      ]
+    },
+    {
+      name: 'Natural Attractions',
+      attractions: [
+        {
+          name: 'Gwaenysgor Viewpoint',
+          location: { lat: 53.32546616498002, lng: -3.391042081599307 },
+          description: 'Panoramic views over the Irish Sea and coastline',
+          links: []
+        },
+        {
+          name: 'Dyserth Waterfall',
+          location: { lat: 53.30189854687248, lng: -3.41759212015089 },
+          description: 'Beautiful 70-foot waterfall and nature walk',
+          links: []
+        },
+        {
+          name: 'Point of Ayr Lighthouse',
+          location: { lat:  53.356886181192095, lng: -3.3221512539549045 },
+          description: 'Historic lighthouse with stunning coastal views',
+          links: []
         }
       ]
     }
@@ -264,7 +387,7 @@ export class GoogleMapComponent implements OnInit {
       this.directionsService = new window.google.maps.DirectionsService();
       this.directionsRenderer = new window.google.maps.DirectionsRenderer({
         draggable: false,
-        suppressMarkers: true, // We'll add custom markers
+        suppressMarkers: true, 
         polylineOptions: {
           strokeColor: '#4285F4',
           strokeWeight: 5,
@@ -283,15 +406,30 @@ export class GoogleMapComponent implements OnInit {
     this.showFallback = true;
   }
   
+  onMapClick(event: google.maps.MapMouseEvent) {
+    // If an attraction is selected and user clicks on the map (not on a marker), deselect it
+    if (this.selectedAttraction && this.showingAttractions) {
+      this.selectedAttraction = null;
+      
+      // Close all attraction info windows
+      this.attractionsInfoWindows.forEach(infoWindow => {
+        infoWindow.close();
+      });
+      
+      // Zoom back out to show all attractions
+      this.adjustAttractionMapView();
+    }
+  }
+  
   toggleMapType() {
     this.mapType = this.mapType === 'roadmap' ? 'satellite' : 'roadmap';
     this.mapOptions = { ...this.mapOptions, mapTypeId: this.mapType };
   }
   
   openDirections() {
-    // Open Google Maps with directions from user's current location
-    const destination = `${this.markerPosition.lat},${this.markerPosition.lng}`;
-    const url = `https://www.google.com/maps/dir//10+Ceri+Ave,+Prestatyn+LL19+7YN,+UK/@${destination}`;
+    // Open Google Maps with directions from user's current location to the property
+    const destination = '10 Ceri Ave, Prestatyn LL19 7YN, UK';
+    const url = `https://www.google.com/maps/dir//${encodeURIComponent(destination)}`;
     window.open(url, '_blank');
   }
   
@@ -314,8 +452,10 @@ export class GoogleMapComponent implements OnInit {
       return;
     }
 
+    // Clear other modes when showing beach directions (mutual exclusion)
     this.clearShops();
     this.clearTransport();
+    this.clearAttractions();
     
     if (!this.directionsService || !this.directionsRenderer) {
       console.error('Directions service not initialized - trying to initialize now');
@@ -462,6 +602,7 @@ export class GoogleMapComponent implements OnInit {
     
     if (this.showFallback) return;
     
+    // Clear other modes when showing shops (mutual exclusion)
     this.clearDirections();
     this.clearTransport();
     this.showingShops = true;
@@ -547,6 +688,7 @@ export class GoogleMapComponent implements OnInit {
     
     this.clearDirections();
     this.clearShops();
+    this.clearAttractions();
     this.showingTransport = true;
     this.transportFilter = 'all';
     
@@ -727,7 +869,7 @@ export class GoogleMapComponent implements OnInit {
   }
   
   private resetMapView() {
-    if (!this.showingDirections && !this.showingShops && !this.showingTransport) {
+    if (!this.showingDirections && !this.showingShops && !this.showingTransport && !this.showingAttractions) {
       this.center = this.markerPosition;
       this.zoom = 15;
       
@@ -739,6 +881,156 @@ export class GoogleMapComponent implements OnInit {
     }
   }
   
+  showLocalAttractions() {
+    if (this.showingAttractions) {
+      // If already showing attractions, clear them
+      this.clearAttractions();
+      return;
+    }
+    
+    if (this.showFallback) return;
+    
+    // Clear other modes when showing attractions (mutual exclusion)
+    this.clearDirections();
+    this.clearShops();
+    this.clearTransport();
+    this.showingAttractions = true;
+    this.selectedAttraction = null;
+    
+    // Create markers for all attractions
+    this.createAttractionMarkers();
+    this.adjustAttractionMapView();
+  }
+  
+  private createAttractionMarkers() {
+    if (!this.map || !this.map.googleMap) return;
+    
+    const allAttractions = this.attractionCategories.flatMap(category => category.attractions);
+    
+    allAttractions.forEach(attraction => {
+      const labelWidth = attraction.name.length * 7 + 20;
+      const iconColor = '#FF6B35';
+      
+      const marker = new google.maps.Marker({
+        position: attraction.location,
+        map: this.map.googleMap,
+        title: attraction.name,
+        icon: {
+          url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" width="${labelWidth + 10}" height="50" viewBox="0 0 ${labelWidth + 10} 50">
+              <!-- Label background -->
+              <rect x="5" y="5" width="${labelWidth}" height="18" rx="9" fill="white" stroke="${iconColor}" stroke-width="1"/>
+              <!-- Label text -->
+              <text x="${(labelWidth + 10) / 2}" y="16" text-anchor="middle" fill="${iconColor}" font-family="Arial, sans-serif" font-size="11" font-weight="bold">${attraction.name}</text>
+              <!-- Marker circle -->
+              <circle cx="${(labelWidth + 10) / 2}" cy="37" r="10" fill="${iconColor}" stroke="white" stroke-width="2"/>
+              <!-- Marker text -->
+              <text x="${(labelWidth + 10) / 2}" y="41" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="8" font-weight="bold">★</text>
+            </svg>
+          `),
+          scaledSize: new google.maps.Size(labelWidth + 10, 50),
+          anchor: new google.maps.Point((labelWidth + 10) / 2, 47)
+        }
+      });
+      
+      // Add info window for each attraction
+      const infoWindow = new google.maps.InfoWindow({
+        content: `
+          <div style="padding: 8px; font-family: Arial, sans-serif; min-width: 200px;">
+            <h4 style="margin: 0 0 4px 0; color: ${iconColor};">${attraction.name}</h4>
+            <p style="margin: 0 0 8px 0; font-size: 12px; color: #666;">${attraction.description}</p>
+          </div>
+        `
+      });
+      
+      marker.addListener('click', () => {
+        // Close any open info windows
+        this.attractionsInfoWindows.forEach(iw => iw.close());
+        infoWindow.open(this.map.googleMap, marker);
+      });
+      
+      this.attractionsMarkers.push(marker);
+      this.attractionsInfoWindows.push(infoWindow);
+    });
+  }
+  
+  private adjustAttractionMapView() {
+    const allAttractions = this.attractionCategories.flatMap(category => category.attractions);
+    
+    // Calculate bounds that include BnB and all attractions
+    const allLocations = [this.markerPosition, ...allAttractions.map(attraction => attraction.location)];
+    const latitudes = allLocations.map(loc => loc.lat);
+    const longitudes = allLocations.map(loc => loc.lng);
+    
+    const minLat = Math.min(...latitudes);
+    const maxLat = Math.max(...latitudes);
+    const minLng = Math.min(...longitudes);
+    const maxLng = Math.max(...longitudes);
+    
+    // Center between all locations
+    const centerLat = (minLat + maxLat) / 2;
+    const centerLng = (minLng + maxLng) / 2;
+    
+    this.center = { lat: centerLat, lng: centerLng };
+    this.zoom = 11; // Zoom out to show all attractions
+  }
+  
+  clearAttractions() {
+    // Clear custom attraction markers
+    this.attractionsMarkers.forEach(marker => {
+      marker.setMap(null);
+    });
+    this.attractionsMarkers = [];
+    
+    // Close all attraction info windows
+    this.attractionsInfoWindows.forEach(infoWindow => {
+      infoWindow.close();
+    });
+    this.attractionsInfoWindows = [];
+    
+    this.showingAttractions = false;
+    this.selectedAttraction = null;
+    this.resetMapView();
+  }
+  
+  zoomToAttraction(categoryIndex: number, attractionIndex: number) {
+    const category = this.attractionCategories[categoryIndex];
+    if (!category || !category.attractions[attractionIndex] || !this.map || !this.map.googleMap) return;
+    
+    const attraction = category.attractions[attractionIndex];
+    
+    // If clicking the same attraction, unselect it and zoom back to all attractions
+    if (this.selectedAttraction?.categoryIndex === categoryIndex && 
+        this.selectedAttraction?.attractionIndex === attractionIndex) {
+      this.selectedAttraction = null;
+      this.adjustAttractionMapView();
+      return;
+    }
+    
+    // Select the new attraction
+    this.selectedAttraction = { categoryIndex, attractionIndex };
+    
+    // Zoom to the specific attraction
+    this.center = attraction.location;
+    this.zoom = 16; // Close zoom for individual attractions
+    
+    // Update Google Map directly
+    this.map.googleMap.setCenter(attraction.location);
+    this.map.googleMap.setZoom(16);
+    
+    // Find and open the info window for this attraction
+    const allAttractions = this.attractionCategories.flatMap(cat => cat.attractions);
+    const globalAttractionIndex = this.attractionCategories.slice(0, categoryIndex)
+      .reduce((sum, cat) => sum + cat.attractions.length, 0) + attractionIndex;
+    
+    if (this.attractionsInfoWindows[globalAttractionIndex]) {
+      // Close all other info windows
+      this.attractionsInfoWindows.forEach(iw => iw.close());
+      // Open the selected attraction's info window
+      this.attractionsInfoWindows[globalAttractionIndex].open(this.map.googleMap, this.attractionsMarkers[globalAttractionIndex]);
+    }
+  }
+
   getBeachLocation(): google.maps.LatLngLiteral {
     return this.beachLocation;
   }

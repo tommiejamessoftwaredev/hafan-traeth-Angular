@@ -328,6 +328,314 @@
   }
 }
 
+.transport-filters {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 2px solid var(--primary-blue);
+  
+  .filter-buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    
+    .filter-btn {
+      padding: 10px 20px;
+      border: 2px solid #e2e8f0;
+      background: white;
+      color: #4a5568;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      
+      &:hover {
+        background: #f8f9fa;
+        border-color: #cbd5e0;
+        transform: translateY(-1px);
+      }
+      
+      &.active {
+        background: var(--primary-blue);
+        color: white;
+        border-color: var(--primary-blue);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        
+        &:hover {
+          background: #5a6fd8;
+          transform: translateY(-1px);
+        }
+      }
+      
+      i {
+        font-size: 1rem;
+      }
+    }
+  }
+  
+  .transport-info {
+    h5 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #333;
+      margin: 0 0 1rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      
+      i {
+        color: var(--primary-blue);
+      }
+    }
+    
+    .bus-routes,
+    .train-routes {
+      display: grid;
+      gap: 1rem;
+      
+      .bus-route,
+      .train-route {
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid var(--primary-blue);
+        
+        strong {
+          display: block;
+          font-size: 1.1rem;
+          color: #333;
+          margin-bottom: 0.5rem;
+        }
+        
+        p {
+          margin: 0 0 1rem 0;
+          color: #666;
+          font-size: 0.9rem;
+        }
+        
+        .route-links {
+          display: flex;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+          
+          .route-link {
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            
+            &.pdf {
+              background: #dc3545;
+              color: white;
+              
+              &:hover {
+                background: #c82333;
+                transform: translateY(-1px);
+              }
+            }
+            
+            &.external {
+              background: var(--primary-blue);
+              color: white;
+              
+              &:hover {
+                background: #5a6fd8;
+                transform: translateY(-1px);
+              }
+            }
+            
+            &.live {
+              background: #28a745;
+              color: white;
+              
+              &:hover {
+                background: #218838;
+                transform: translateY(-1px);
+              }
+            }
+            
+            i {
+              font-size: 0.8rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.attractions-section {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 2px solid #FF6B35;
+  
+  h4 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 1.5rem 0;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    
+    i {
+      color: #FF6B35;
+    }
+  }
+  
+  .attractions-grid {
+    display: grid;
+    gap: 1.5rem;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    
+    /* Custom scrollbar styling */
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: #FF6B35;
+      border-radius: 3px;
+      
+      &:hover {
+        background: #e55a2b;
+      }
+    }
+    
+    .attraction-category {
+      .category-header {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #FF6B35;
+        margin: 0 0 1rem 0;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #FF6B35;
+      }
+      
+      .attraction-list {
+        display: grid;
+        gap: 1rem;
+        
+        .attraction-item {
+          padding: 1rem;
+          background: #f8f9fa;
+          border-radius: 8px;
+          border-left: 4px solid #FF6B35;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          
+          &:hover {
+            background: #e9ecef;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.2);
+          }
+          
+          &.selected {
+            background: #FF6B35;
+            color: white;
+            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);
+            
+            .attraction-content strong,
+            .attraction-content p {
+              color: white;
+            }
+            
+            .map-indicator {
+              color: white;
+            }
+            
+            &:hover {
+              background: #e55a2b;
+            }
+          }
+          
+          .attraction-content {
+            flex: 1;
+            
+            strong {
+              display: block;
+              font-size: 1rem;
+              color: #333;
+              margin-bottom: 0.5rem;
+            }
+            
+            p {
+              margin: 0 0 0.8rem 0;
+              color: #666;
+              font-size: 0.9rem;
+            }
+            
+            .attraction-links {
+              display: flex;
+              gap: 0.5rem;
+              flex-wrap: wrap;
+              
+              .attraction-link {
+                padding: 4px 8px;
+                border-radius: 4px;
+                text-decoration: none;
+                font-size: 0.8rem;
+                font-weight: 600;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 0.3rem;
+                background: #FF6B35;
+                color: white;
+                
+                &:hover {
+                  background: #e55a2b;
+                  transform: translateY(-1px);
+                }
+                
+                i {
+                  font-size: 0.7rem;
+                }
+              }
+            }
+          }
+          
+          .map-indicator {
+            color: #FF6B35;
+            font-size: 1.2rem;
+            margin-left: 1rem;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+          }
+        }
+      }
+    }
+  }
+}
+
 .location-features {
   padding: 2rem;
   background: #f8f9fa;
@@ -525,6 +833,67 @@
     .directions-btn,
     .satellite-btn {
       width: 100%;
+    }
+  }
+  
+  .transport-filters {
+    margin: 1rem 0;
+    padding: 1rem;
+    
+    .filter-buttons {
+      justify-content: stretch;
+      
+      .filter-btn {
+        flex: 1;
+        min-width: 0;
+        font-size: 0.8rem;
+        padding: 8px 12px;
+        
+        span {
+          display: none;
+        }
+      }
+    }
+    
+    .transport-info {
+      .bus-routes {
+        .bus-route {
+          .route-links {
+            .route-link {
+              flex: 1;
+              justify-content: center;
+              font-size: 0.8rem;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  .attractions-section {
+    margin: 1rem 0;
+    padding: 1rem;
+    
+    .attractions-grid {
+      gap: 1rem;
+      
+      .attraction-category {
+        .attraction-list {
+          gap: 0.8rem;
+          
+          .attraction-item {
+            padding: 0.8rem;
+            
+            .attraction-links {
+              .attraction-link {
+                flex: 1;
+                justify-content: center;
+                font-size: 0.75rem;
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

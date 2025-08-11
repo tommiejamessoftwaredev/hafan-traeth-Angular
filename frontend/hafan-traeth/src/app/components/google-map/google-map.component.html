@@ -5,6 +5,65 @@
     <p>🔗 What3Words: ///funny.cherub.hospitals</p>
   </div>
   
+
+  <div class="map-container">
+    <!-- Google Maps Angular Component -->
+    <div *ngIf="!showFallback && mapLoaded" class="interactive-map">
+      <google-map 
+        [center]="center"
+        [zoom]="zoom"
+        [options]="mapOptions"
+        width="100%"
+        height="400px"
+        (mapInitialized)="onMapReady()"
+        (mapError)="onMapError($event)"
+        (mapClick)="onMapClick($event)">
+        
+        <!-- BnB Marker (hidden when showing directions since we have custom markers) -->
+        <map-marker 
+          *ngIf="!showingDirections"
+          [position]="markerPosition"
+          [options]="markerOptions"
+          title="Hafan Traeth - Your Coastal Retreat">
+        </map-marker>
+        
+        <!-- Shopping Area Highlight (invisible overlay to show area) -->
+        <ng-container *ngIf="showingShops">
+          <!-- We'll just adjust the map view and let Google Maps show its own business markers -->
+        </ng-container>
+        
+        <map-info-window>
+          <div class="map-info-content">
+            <h4>🏡 Hafan Traeth</h4>
+            <p>Your perfect coastal retreat</p>
+            <strong>📍 10 Ceri Ave, Prestatyn LL19 7YN</strong>
+          </div>
+        </map-info-window>
+      </google-map>
+    </div>
+    
+    <!-- Fallback Map -->
+    <div *ngIf="showFallback" class="fallback-map">
+      <iframe 
+        src="https://www.openstreetmap.org/export/embed.html?bbox=-3.441334999915092,53.32336569521891,-3.421334999915092,53.34336569521891&amp;layer=mapnik&amp;marker=53.33336569521891,-3.431334999915092"
+        width="100%" 
+        height="400" 
+        style="border: none; border-radius: 8px;"
+        title="Property Location Map">
+      </iframe>
+      <div class="fallback-notice">
+        <p>📍 <strong>Hafan Traeth</strong> - 10 Ceri Ave, Prestatyn LL19 7YN</p>
+        <small>Interactive map unavailable - showing OpenStreetMap fallback</small>
+      </div>
+    </div>
+    
+    <!-- Loading state -->
+    <div class="map-placeholder" *ngIf="!mapLoaded">
+      <div class="loading-spinner"></div>
+      <p>Loading interactive map...</p>
+    </div>
+  </div>
+
   <!-- Transport Filter Section (shown when transport is active) -->
   <div *ngIf="showingTransport" class="transport-filters">
     <div class="filter-buttons">
@@ -58,62 +117,50 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <div class="map-container">
-    <!-- Google Maps Angular Component -->
-    <div *ngIf="!showFallback && mapLoaded" class="interactive-map">
-      <google-map 
-        [center]="center"
-        [zoom]="zoom"
-        [options]="mapOptions"
-        width="100%"
-        height="400px"
-        (mapInitialized)="onMapReady()"
-        (mapError)="onMapError($event)">
-        
-        <!-- BnB Marker (hidden when showing directions since we have custom markers) -->
-        <map-marker 
-          *ngIf="!showingDirections"
-          [position]="markerPosition"
-          [options]="markerOptions"
-          title="Hafan Traeth - Your Coastal Retreat">
-        </map-marker>
-        
-        <!-- Shopping Area Highlight (invisible overlay to show area) -->
-        <ng-container *ngIf="showingShops">
-          <!-- We'll just adjust the map view and let Google Maps show its own business markers -->
-        </ng-container>
-        
-        <map-info-window>
-          <div class="map-info-content">
-            <h4>🏡 Hafan Traeth</h4>
-            <p>Your perfect coastal retreat</p>
-            <strong>📍 10 Ceri Ave, Prestatyn LL19 7YN</strong>
-          </div>
-        </map-info-window>
-      </google-map>
-    </div>
     
-    <!-- Fallback Map -->
-    <div *ngIf="showFallback" class="fallback-map">
-      <iframe 
-        src="https://www.openstreetmap.org/export/embed.html?bbox=-3.441334999915092,53.32336569521891,-3.421334999915092,53.34336569521891&amp;layer=mapnik&amp;marker=53.33336569521891,-3.431334999915092"
-        width="100%" 
-        height="400" 
-        style="border: none; border-radius: 8px;"
-        title="Property Location Map">
-      </iframe>
-      <div class="fallback-notice">
-        <p>📍 <strong>Hafan Traeth</strong> - 10 Ceri Ave, Prestatyn LL19 7YN</p>
-        <small>Interactive map unavailable - showing OpenStreetMap fallback</small>
+    <!-- Train Information -->
+    <div class="transport-info" *ngIf="transportFilter === 'train' || transportFilter === 'all'">
+      <h5><i class="fas fa-train"></i> Train Services</h5>
+      <div class="train-routes">
+        <div class="train-route">
+          <strong>Prestatyn Railway Station</strong>
+          <p>Direct services to Chester, Holyhead & Manchester</p>
+          <div class="route-links">
+            <a href="https://www.thetrainline.com/live/departures/prestatyn" target="_blank" class="route-link live">
+              <i class="fas fa-clock"></i> Live Departures
+            </a>
+          </div>
+        </div>
       </div>
     </div>
-    
-    <!-- Loading state -->
-    <div class="map-placeholder" *ngIf="!mapLoaded">
-      <div class="loading-spinner"></div>
-      <p>Loading interactive map...</p>
+  </div>
+
+  <!-- Local Attractions Section (shown when attractions is active) -->
+  <div *ngIf="showingAttractions" class="attractions-section">
+    <h4><i class="fas fa-map-marked-alt"></i> Local Attractions</h4>
+    <div class="attractions-grid">
+      <div class="attraction-category" *ngFor="let category of attractionCategories; let categoryIndex = index">
+        <h5 class="category-header">{{ category.name }}</h5>
+        <div class="attraction-list">
+          <div class="attraction-item" 
+               *ngFor="let attraction of category.attractions; let attractionIndex = index"
+               (click)="zoomToAttraction(categoryIndex, attractionIndex)"
+               [class.selected]="selectedAttraction?.categoryIndex === categoryIndex && selectedAttraction?.attractionIndex === attractionIndex">
+            <div class="attraction-content">
+              <strong>{{ attraction.name }}</strong>
+              <p>{{ attraction.description }}</p>
+              <div class="attraction-links" *ngIf="attraction.links?.length" (click)="$event.stopPropagation()">
+                <a *ngFor="let link of attraction.links" [href]="link.url" target="_blank" class="attraction-link">
+                  <i [class]="link.icon"></i> {{ link.text }}
+                </a>
+              </div>
+            </div>
+            <div class="map-indicator">
+              <i class="fas fa-map-marker-alt"></i>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   
@@ -128,11 +175,12 @@
         </div>
       </div>
       
-      <div class="feature-item">
-        <span class="icon"><i class="fas fa-car"></i></span>
+      <div class="feature-item clickable" [class.active]="showingAttractions" (click)="showLocalAttractions()">
+        <span class="icon"><i class="fas fa-map-marked-alt"></i></span>
         <div class="feature-text">
-          <h5>Parking</h5>
-          <p>Free on-site parking available</p>
+          <h5>Local Attractions</h5>
+          <p>Castles, beaches, golf, and entertainment</p>
+          <small class="directions-hint">{{ showingAttractions ? 'Click to hide attractions' : 'Click to show attractions' }}</small>
         </div>
       </div>
       
@@ -167,14 +215,8 @@
       
       <div class="transport-option">
         <strong><i class="fas fa-train"></i> By Train:</strong>
-        <p>Prestatyn Railway Station: 1 mile<br>
+        <p>Prestatyn Railway Station: Direct bus or 5 minute taxi<br>
            Direct services from Chester & Holyhead</p>
-      </div>
-      
-      <div class="transport-option">
-        <strong><i class="fas fa-plane"></i> By Air:</strong>
-        <p>Liverpool Airport: 1 hour<br>
-           Manchester Airport: 1.5 hours</p>
       </div>
     </div>
     
