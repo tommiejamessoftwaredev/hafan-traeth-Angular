@@ -151,13 +151,13 @@ export class GoogleMapComponent implements OnInit {
           name: 'Bodelwyddan Castle',
           location: { lat: 53.26146141185901, lng: -3.502740685134114 },
           description: 'Victorian castle with art galleries and parkland',
-          links: [{ url: 'https://www.bodelwyddan-castle.co.uk/', text: 'Official Site', icon: 'fas fa-external-link-alt' }]
+          links: [{ url: 'https://www.warnerhotels.co.uk/hotels/bodelwyddan-castle-hotel', text: 'Official Site', icon: 'fas fa-external-link-alt' }]
         },
         {
           name: 'Gwrych Castle',
           location: { lat: 53.283126350431665, lng:-3.6071014498577987 },
           description: 'Spectacular 19th-century castle, home to I\'m A Celebrity',
-          links: [{ url: 'https://gwryckcastle.co.uk/', text: 'Official Site', icon: 'fas fa-external-link-alt' }]
+          links: [{ url: 'https://www.gwrychcastle.co.uk/', text: 'Official Site', icon: 'fas fa-external-link-alt' }]
         }
       ]
     },
@@ -185,7 +185,7 @@ export class GoogleMapComponent implements OnInit {
           name: 'Prestatyn Golf Club',
           location: { lat:   53.34359585248063, lng: -3.399578575590329},
           description: '18-hole championship golf course',
-          links: [{ url: 'https://prestatatyngolfclub.co.uk/', text: 'Book Tee Time', icon: 'fas fa-golf-ball' }]
+          links: [{ url: 'https://prestatyngolfclub.co.uk/visitors.html', text: 'Visit Info', icon: 'fas fa-golf-ball' }]
         },
         {
           name: 'Crazy Golf',
@@ -214,19 +214,19 @@ export class GoogleMapComponent implements OnInit {
           name: 'SC2 Rhyl',
           location: { lat: 53.32061732066503, lng: -3.495869050296468 },
           description: 'Large waterpark and leisure complex',
-          links: [{ url: 'https://www.sc2.wales/', text: 'Book Tickets', icon: 'fas fa-swimmer' }]
+          links: [{ url: 'https://sc2rhyl.co.uk/', text: 'Book Tickets', icon: 'fas fa-swimmer' }]
         },
         {
           name: 'Scala Cinema',
           location: { lat: 53.33535241551636, lng: -3.4047116610715236 },
           description: 'Local cinema showing latest films',
-          links: []
+          links: [{ url: 'https://www.merlincinemas.co.uk/', text: 'View Films', icon: 'fas fa-film' }]
         },
         {
           name: 'Pavilion Theatre',
           location: { lat: 53.32621110538621, lng: -3.4833133622145165 },
           description: 'Historic theatre with live performances',
-          links: []
+          links: [{ url: 'https://rhylpavilion.co.uk/', text: 'Show Times', icon: 'fas fa-theater-masks' }]
         }
       ]
     },
@@ -545,6 +545,7 @@ export class GoogleMapComponent implements OnInit {
     
     this.clearDirections();
     this.clearTransport();
+    this.clearAttractions();
     this.showingShops = true;
     
     this.mapOptions = { ...this.mapOptions, styles: this.groceryStoreMapStyle };
