@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GoogleMap, MapInfoWindow, MapMarker } from '@angular/google-maps';
-import { environment } from '../../../environments/environment';
+import { ConfigService, AppConfig } from '../../services/config.service';
 
 @Component({
   selector: 'app-google-map',
@@ -12,7 +12,7 @@ import { environment } from '../../../environments/environment';
 export class GoogleMapComponent implements OnInit {
   @ViewChild(GoogleMap) map!: GoogleMap;
   
-  environment = environment;
+  config: AppConfig | null = null;
   
   mapLoaded = false;
   mapType: 'roadmap' | 'satellite' = 'roadmap';
@@ -106,12 +106,12 @@ export class GoogleMapComponent implements OnInit {
       links: [
         {
           text: 'View Route 36 Timetable',
-          url: environment.busRoute36PdfUrl,
+          url: this.config?.busRoute36PdfUrl,
           type: 'pdf'
         },
         {
           text: 'Route 36 Journey Planner',
-          url: environment.busRoute36PlannerUrl,
+          url: this.config?.busRoute36PlannerUrl,
           type: 'external'
         }
       ]
@@ -125,12 +125,12 @@ export class GoogleMapComponent implements OnInit {
       links: [
         {
           text: 'View Route 35 Timetable',
-          url: environment.busRoute35PdfUrl,
+          url: this.config?.busRoute35PdfUrl,
           type: 'pdf'
         },
         {
           text: 'Route 35 Journey Planner',
-          url: environment.busRoute35PlannerUrl,
+          url: this.config?.busRoute35PlannerUrl,
           type: 'external'
         }
       ]
@@ -310,14 +310,22 @@ export class GoogleMapComponent implements OnInit {
     zoomControl: true
   };
 
-  constructor() {}
+  constructor(private configService: ConfigService) {}
   
   ngOnInit() {
-    this.loadGoogleMapsAPI();
+    this.configService.getConfig().subscribe(config => {
+      this.config = config;
+      this.loadGoogleMapsAPI();
+    });
   }
   
   private loadGoogleMapsAPI() {
-    const apiKey = environment.googleMapsApiKey;
+    if (!this.config) {
+      console.error('Config not loaded');
+      return;
+    }
+    
+    const apiKey = this.config.googleMapsApiKey;
     
     if (!apiKey ) {
       console.warn('Google Maps API key not configured or using example key. Showing fallback map.');

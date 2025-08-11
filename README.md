@@ -23,16 +23,23 @@ A modern, responsive Angular application with a .net azure functions backend, sh
 ## Technology Stack
 
 ### Frontend
-- **Angular**
-- **SCSS**
-- **Google Maps JavaScript API**
-- **Google Fonts** 
-- **Font Awesome**
+- **Angular 18+** with standalone components
+- **SCSS** with responsive design patterns
+- **Google Maps JavaScript API** with custom markers
+- **Google Fonts** and **Font Awesome** for typography and icons
+- **HTTP Client** for API integration
+
+### Backend
+- **.NET 8** Azure Functions for serverless computing
+- **Azure Static Web Apps** for hosting and deployment
+- **Environment Variables** for secure configuration management
+- **iCalendar Integration** for real-time availability data
 
 ### Development Tools
 - **TypeScript** - Type-safe development
 - **Angular CLI** - Development and build tooling
 - **ESLint** - Code quality and consistency
+- **GitHub Actions** - CI/CD pipeline
 
 ## Architecture & Components
 
@@ -116,11 +123,13 @@ The application is fully responsive across all device types:
 
 ## TODO / Future Enhancements
 
-### Backend Integration
-- **Price Calculation API**: Integrate the existing Azure Functions backend for dynamic pricing
-  - Future: Connect availability calendar to Azure Functions for real-time pricing calculation
-  - API endpoints ready: `GetPricing`, `GetAvailability`, `CreateBooking`
-  - Located in: `/api/Functions/` (C# Azure Functions)
+### Backend Integration ✅
+- **Azure Functions API**: .NET 8 Azure Functions backend for secure configuration and data processing
+  - **Configuration Service** (`/api/GetConfiguration`): Serves environment-specific settings securely
+  - **iCalendar Integration** (`/api/GetICalData`): Processes booking calendar data
+  - **Pricing API**: Ready endpoints for dynamic pricing calculation: `GetPricing`, `GetAvailability`, `CreateBooking`
+  - **Security**: Environment variables handled server-side, no sensitive data exposed to client
+  - **CORS Configuration**: Proper cross-origin resource sharing for frontend integration
 
 ## Getting Started
 

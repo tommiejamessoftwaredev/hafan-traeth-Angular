@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
+import { ConfigService, AppConfig } from '../../services/config.service';
 
 interface CalendarDay {
   date: Date | null;
@@ -27,8 +27,9 @@ interface BookingEvent {
   styleUrl: './availability-calendar.component.scss'
 })
 export class AvailabilityCalendarComponent implements OnInit {
+  config: AppConfig | null = null;
   
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private configService: ConfigService) {}
   checkinDate: string = '';
   checkoutDate: string = '';
   minDate: string = '';
@@ -46,18 +47,25 @@ export class AvailabilityCalendarComponent implements OnInit {
   calendarDays: CalendarDay[] = [];
   dayHeaders: string[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   
-  // Booking URLs from environment configuration
-  bookingComUrl: string = environment.bookingComUrl;
-  airbnbUrl: string = environment.airbnbUrl;
+  // Booking URLs from configuration
+  bookingComUrl: string = '';
+  airbnbUrl: string = '';
   
   // Real unavailable dates from iCalendar
   unavailableDates: Date[] = [];
   bookingEvents: BookingEvent[] = [];
-  icalUrl: string = environment.icalUrl;
+  icalUrl: string = '';
 
   ngOnInit() {
-    this.setMinDate();
-    this.loadAvailability();
+    this.configService.getConfig().subscribe(config => {
+      this.config = config;
+      this.bookingComUrl = config.bookingComUrl;
+      this.airbnbUrl = config.airbnbUrl;
+      this.icalUrl = config.icalUrl;
+      
+      this.setMinDate();
+      this.loadAvailability();
+    });
     this.generateCalendar();
   }
 
@@ -285,16 +293,16 @@ export class AvailabilityCalendarComponent implements OnInit {
 
   getBookingComUrl(): string {
     if (this.checkinDate && this.checkoutDate) {
-      return `${environment.bookingComUrl}?checkin=${this.checkinDate}&checkout=${this.checkoutDate}`;
+      return `${this.bookingComUrl}?checkin=${this.checkinDate}&checkout=${this.checkoutDate}`;
     }
-    return `${environment.bookingComUrl}?checkin=2025-08-17&checkout=2025-09-16`;
+    return `${this.bookingComUrl}?checkin=2025-08-17&checkout=2025-09-16`;
   }
 
   getAirbnbUrl(): string {
     if (this.checkinDate && this.checkoutDate) {
-      return `${environment.airbnbUrl}?check_in=${this.checkinDate}&check_out=${this.checkoutDate}&guests=1&adults=1`;
+      return `${this.airbnbUrl}?check_in=${this.checkinDate}&check_out=${this.checkoutDate}&guests=1&adults=2`;
     }
-    return `${environment.airbnbUrl}?&check_in=2025-09-01&guests=1&adults=1&check_out=2025-09-03`;
+    return `${this.airbnbUrl}?&check_in=2025-09-01&guests=2&adults=2&check_out=2025-09-03`;
   }
 
   bookOnBookingCom(): void {
@@ -343,7 +351,7 @@ export class AvailabilityCalendarComponent implements OnInit {
   }
 
   loadAvailability(): void {
-    const proxyUrl = `${environment.apiUrl}/GetICalData`;
+    const proxyUrl = `${this.config?.apiUrl}/GetICalData`;
     
     this.http.get(proxyUrl, { responseType: 'text' })
       .subscribe({

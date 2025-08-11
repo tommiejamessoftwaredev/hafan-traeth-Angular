@@ -3,6 +3,16 @@
     "Values": {
         "AzureWebJobsStorage": "UseDevelopmentStorage=true",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-        "ICAL_URL": "YOUR_ICAL_URL_HERE"
+        "GOOGLE_MAPS_API_KEY": "YOUR_DEVELOPMENT_GOOGLE_MAPS_API_KEY_HERE",
+        "API_BASE_URL": "http://localhost:7071/api",
+        "BOOKING_COM_URL": "https://www.booking.com/hotel/gb/hafan-traeth.en-gb.html",
+        "BOOKING_COM_REVIEWS_URL": "https://www.booking.com/hotel/gb/hafan-traeth.en-gb.html#tab-reviews",
+        "AIRBNB_URL": "https://www.airbnb.co.uk/rooms/920441523710400719",
+        "AIRBNB_REVIEWS_URL": "https://www.airbnb.co.uk/rooms/920441523710400719/reviews",
+        "ICAL_URL": "https://ical.booking.com/v1/export?t=32f37ade-b2ed-48b9-9e49-573b6dcc4660",
+        "BUS_ROUTE_35_PDF_URL": "/36-Rhyl-Circular-from-26-Jan-2025.pdf",
+        "BUS_ROUTE_36_PDF_URL": "/35-Rhyl-Circular-from-26-Jan-2025.pdf",
+        "BUS_ROUTE_35_PLANNER_URL": "https://www.arrivabus.co.uk/find-a-service/35-rhyl-circular",
+        "BUS_ROUTE_36_PLANNER_URL": "https://www.arrivabus.co.uk/find-a-service/36-rhyl-circular"
     }
 }

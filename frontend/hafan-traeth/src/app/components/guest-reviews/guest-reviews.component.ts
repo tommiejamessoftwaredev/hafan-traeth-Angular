@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { environment } from '../../../environments/environment';
+import { ConfigService, AppConfig } from '../../services/config.service';
 
 interface Review {
   name: string;
@@ -25,7 +25,8 @@ interface RatingCategory {
   templateUrl: './guest-reviews.component.html',
   styleUrl: './guest-reviews.component.scss'
 })
-export class GuestReviewsComponent {
+export class GuestReviewsComponent implements OnInit {
+  config: AppConfig | null = null;
   overallRating = 9.7;
 
   reviews: Review[] = [
@@ -105,8 +106,18 @@ export class GuestReviewsComponent {
     { name: 'Facilities', score: 9.6 }
   ];
 
-  bookingComReviewsUrl = environment.bookingComReviewsUrl;
-  airbnbReviewsUrl = environment.airbnbReviewsUrl;
+  bookingComReviewsUrl = '';
+  airbnbReviewsUrl = '';
+
+  constructor(private configService: ConfigService) {}
+
+  ngOnInit() {
+    this.configService.getConfig().subscribe(config => {
+      this.config = config;
+      this.bookingComReviewsUrl = config.bookingComReviewsUrl;
+      this.airbnbReviewsUrl = config.airbnbReviewsUrl;
+    });
+  }
 
   getStarsArray(rating: number) {
     const stars = [];

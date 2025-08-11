@@ -27,7 +27,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
           app_location: "./frontend/hafan-traeth" # App source code path
-          api_location: "./api" # don't deploy api for now
+          api_location: "./api"
           output_location: "dist/hafan-traeth/browser" 
 
   close_pull_request_job:
