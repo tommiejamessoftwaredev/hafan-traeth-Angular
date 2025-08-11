@@ -2,23 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { ConfigService, AppConfig } from '../../services/config.service';
+import { ConfigService } from '../../services/config.service';
+import { AppConfig } from '../../interfaces/config.interface';
+import { CalendarDay, BookingEvent } from '../../interfaces/calendar.interface';
 
-interface CalendarDay {
-  date: Date | null;
-  available: boolean;
-  selected: boolean;
-  isToday: boolean;
-  isCheckIn: boolean;
-  isCheckOut: boolean;
-  isInRange: boolean;
-}
-
-interface BookingEvent {
-  start: Date;
-  end: Date;
-  summary: string;
-}
 
 @Component({
   selector: 'app-availability-calendar',

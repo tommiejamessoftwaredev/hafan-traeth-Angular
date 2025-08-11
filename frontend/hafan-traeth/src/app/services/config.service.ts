@@ -2,20 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, shareReplay } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-
-export interface AppConfig {
-  googleMapsApiKey: string;
-  apiUrl: string;
-  bookingComUrl: string;
-  bookingComReviewsUrl: string;
-  airbnbUrl: string;
-  airbnbReviewsUrl: string;
-  icalUrl: string;
-  busRoute35PdfUrl: string;
-  busRoute36PdfUrl: string;
-  busRoute35PlannerUrl: string;
-  busRoute36PlannerUrl: string;
-}
+import { AppConfig } from '../interfaces/config.interface';
 
 @Injectable({
   providedIn: 'root'

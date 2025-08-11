@@ -1,7 +1,13 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GoogleMap, MapInfoWindow, MapMarker } from '@angular/google-maps';
-import { ConfigService, AppConfig } from '../../services/config.service';
+import { ConfigService } from '../../services/config.service';
+import { AppConfig } from '../../interfaces/config.interface';
+import { MapLocation, AttractionCategory } from '../../interfaces/map.interface';
+import { LOCAL_SHOPS, ATTRACTION_CATEGORIES } from '../../constants/map-locations.const';
+import { getTransportOptions } from '../../constants/transport-locations.const';
+import { MAP_STYLES, DEFAULT_MAP_OPTIONS } from '../../constants/map-styles.const';
+import { MAP_CONFIG } from '../../constants/map-config.const';
 
 @Component({
   selector: 'app-google-map',
@@ -35,286 +41,29 @@ export class GoogleMapComponent implements OnInit {
   attractionsMarkers: google.maps.Marker[] = [];
   attractionsInfoWindows: google.maps.InfoWindow[] = [];
   
-  center: google.maps.LatLngLiteral = { lat: 53.33336569521891, lng: -3.431334999915092 };
-  zoom = 15;
+  center: google.maps.LatLngLiteral = MAP_CONFIG.CENTER;
+  zoom = MAP_CONFIG.ZOOM;
   
-  markerOptions: google.maps.MarkerOptions = {
-    draggable: false
-  };
+  markerOptions: google.maps.MarkerOptions = MAP_CONFIG.MARKER_OPTIONS;
   
-  markerPosition: google.maps.LatLngLiteral = { lat: 53.33336569521891, lng: -3.431334999915092 };
+  markerPosition: google.maps.LatLngLiteral = MAP_CONFIG.MARKER_POSITION;
   
-  private readonly beachLocation = {
-    lat: 53.33727314564057,
-    lng: -3.432135755118875
-  };
+  private readonly beachLocation = MAP_CONFIG.BEACH_LOCATION;
   
-  localShops = [
-    {
-      name: 'Spar',
-      location: { lat: 53.33498801660247, lng: -3.427581293313341 },
-      type: 'convenience_store',
-      description: 'Spar convenience store on Victoria Road'
-    },
-    {
-      name: 'Co-op',
-      location: { lat: 53.33661637351705, lng: -3.4157436514852186 },
-      type: 'grocery_or_supermarket',
-      description: 'Co-operative Food store on Victoria Road'
-    },
-    {
-      name: 'Tesco',
-      location: { lat: 53.33673759602825, lng: -3.401879530165172 },
-      type: 'grocery_or_supermarket',
-      description: 'Large Tesco superstore'
-    },
-    {
-      name: 'Home Bargains',
-      location: { lat: 53.33540812533078, lng: -3.408008607890734 },
-      type: 'store',
-      description: 'Home Bargains discount store'
-    },
-    {
-      name: 'Lidl',
-      location: { lat: 53.33429370519122, lng: -3.405421421372873 },
-      type: 'grocery_or_supermarket',
-      description: 'Lidl supermarket'
-    },
-    {
-      name: 'Aldi',
-      location: { lat: 53.33097772063083, lng: -3.4028241117530307 },
-      type: 'grocery_or_supermarket',
-      description: 'Aldi supermarket at the top of town'
-    }
-  ];
+  localShops: MapLocation[] = LOCAL_SHOPS;
   
-  transportOptions = [
-    {
-      name: 'Prestatyn Railway Station',
-      location: { lat: 53.336151690290315, lng: -3.4074164897070847 },
-      type: 'train_station',
-      description: 'Direct services from Chester & Holyhead',
-      icon: 'T',
-      links: []
-    },
-    {
-      name: 'Brig-Y-Don (Route 36 to Rhyl)',
-      location: { lat: 53.3325831939434, lng: -3.434729270045932 },
-      type: 'bus_station',
-      description: 'Bus Route 36 - Rhyl Circular service',
-      icon: '36',
-      links: [
-        {
-          text: 'View Route 36 Timetable',
-          url: this.config?.busRoute36PdfUrl,
-          type: 'pdf'
-        },
-        {
-          text: 'Route 36 Journey Planner',
-          url: this.config?.busRoute36PlannerUrl,
-          type: 'external'
-        }
-      ]
-    },
-    {
-      name: 'Brig-Y-Don (Route 35 to Town)',
-      location: { lat: 53.33263781742478, lng: -3.4350447197400875 },
-      type: 'bus_station',
-      description: 'Bus Route 35 - Rhyl Circular to Prestatyn town center',
-      icon: '35',
-      links: [
-        {
-          text: 'View Route 35 Timetable',
-          url: this.config?.busRoute35PdfUrl,
-          type: 'pdf'
-        },
-        {
-          text: 'Route 35 Journey Planner',
-          url: this.config?.busRoute35PlannerUrl,
-          type: 'external'
-        }
-      ]
-    }
-  ];
+  transportOptions: MapLocation[] = [];
 
-  attractionCategories = [
-    {
-      name: 'Castles & Historic Sites',
-      attractions: [
-        {
-          name: 'Rhuddlan Castle',
-          location: { lat: 53.28984747153027, lng: -3.46465229345647},
-          description: '13th-century castle ruins with rich Welsh history',
-          links: [{ url: 'https://cadw.gov.wales/visit/places-to-visit/rhuddlan-castle', text: 'Visit Info', icon: 'fas fa-external-link-alt' }]
-        },
-        {
-          name: 'Bodelwyddan Castle',
-          location: { lat: 53.26146141185901, lng: -3.502740685134114 },
-          description: 'Victorian castle with art galleries and parkland',
-          links: [{ url: 'https://www.warnerhotels.co.uk/hotels/bodelwyddan-castle-hotel', text: 'Official Site', icon: 'fas fa-external-link-alt' }]
-        },
-        {
-          name: 'Gwrych Castle',
-          location: { lat: 53.283126350431665, lng:-3.6071014498577987 },
-          description: 'Spectacular 19th-century castle, home to I\'m A Celebrity',
-          links: [{ url: 'https://www.gwrychcastle.co.uk/', text: 'Official Site', icon: 'fas fa-external-link-alt' }]
-        }
-      ]
-    },
-    {
-      name: 'Beaches',
-      attractions: [
-        {
-          name: 'Ffrith Beach',
-          location: { lat: 53.33596719394663, lng: -3.4381125994646626 },
-          description: 'Beautiful sandy beach, 5-minute walk from the property',
-          links: []
-        },
-        {
-          name: 'Barkby Beach',
-          location: { lat: 53.34501151962178, lng: -3.4021314919914016 },
-          description: 'Quiet sandy beach perfect for relaxation',
-          links: []
-        }
-      ]
-    },
-    {
-      name: 'Golf & Sports',
-      attractions: [
-        {
-          name: 'Prestatyn Golf Club',
-          location: { lat:   53.34359585248063, lng: -3.399578575590329},
-          description: '18-hole championship golf course',
-          links: [{ url: 'https://prestatyngolfclub.co.uk/visitors.html', text: 'Visit Info', icon: 'fas fa-golf-ball' }]
-        },
-        {
-          name: 'Crazy Golf',
-          location: { lat:  53.341409133712176, lng: -3.4119256381834266 },
-          description: 'Family-friendly mini golf course',
-          links: []
-        },
-        {
-          name: 'AstroBowl',
-          location: { lat: 53.3344759338221, lng: -3.4327660688154977 },
-          description: 'Traditional bowling green and club',
-          links: []
-        }
-      ]
-    },
-    {
-      name: 'Entertainment & Attractions',
-      attractions: [
-        {
-          name: 'Nova Leisure Centre',
-          location: { lat: 53.341928338627746, lng: -3.4130666523605555 },
-          description: 'Entertainment complex with cinema and restaurants',
-          links: []
-        },
-        { 
-          name: 'SC2 Rhyl',
-          location: { lat: 53.32061732066503, lng: -3.495869050296468 },
-          description: 'Large waterpark and leisure complex',
-          links: [{ url: 'https://sc2rhyl.co.uk/', text: 'Book Tickets', icon: 'fas fa-swimmer' }]
-        },
-        {
-          name: 'Scala Cinema',
-          location: { lat: 53.33535241551636, lng: -3.4047116610715236 },
-          description: 'Local cinema showing latest films',
-          links: [{ url: 'https://www.merlincinemas.co.uk/', text: 'View Films', icon: 'fas fa-film' }]
-        },
-        {
-          name: 'Pavilion Theatre',
-          location: { lat: 53.32621110538621, lng: -3.4833133622145165 },
-          description: 'Historic theatre with live performances',
-          links: [{ url: 'https://rhylpavilion.co.uk/', text: 'Show Times', icon: 'fas fa-theater-masks' }]
-        }
-      ]
-    },
-    {
-      name: 'Natural Attractions',
-      attractions: [
-        {
-          name: 'Gwaenysgor Viewpoint',
-          location: { lat: 53.32546616498002, lng: -3.391042081599307 },
-          description: 'Panoramic views over the Irish Sea and coastline',
-          links: []
-        },
-        {
-          name: 'Dyserth Waterfall',
-          location: { lat: 53.30189854687248, lng: -3.41759212015089 },
-          description: 'Beautiful 70-foot waterfall and nature walk',
-          links: []
-        },
-        {
-          name: 'Point of Ayr Lighthouse',
-          location: { lat:  53.356886181192095, lng: -3.3221512539549045 },
-          description: 'Historic lighthouse with stunning coastal views',
-          links: []
-        }
-      ]
-    }
-  ];
+  attractionCategories: AttractionCategory[] = ATTRACTION_CATEGORIES;
   
-  private readonly groceryStoreMapStyle = [
-    {
-      featureType: 'poi',
-      stylers: [{ visibility: 'off' }]
-    },
-    {
-      featureType: 'landscape',
-      elementType: 'geometry',
-      stylers: [{ color: '#ffffffff' }]
-    },
-    {
-      featureType: 'road',
-      stylers: [{ visibility: 'simplified' }]
-    },
-    {
-      featureType: 'administrative',
-      elementType: 'labels',
-      stylers: [{ visibility: 'on' }]
-    }
-  ];
-  
-  private readonly transportMapStyle = [
-    {
-      featureType: 'poi',
-      stylers: [{ visibility: 'off' }]
-    },
-    {
-      featureType: 'landscape',
-      elementType: 'geometry',
-      stylers: [{ color: '#ffffffff' }]
-    }
-  ];
-  
-  private readonly defaultMapStyle = [
-    {
-      featureType: 'water',
-      elementType: 'geometry',
-      stylers: [{ color: '#5e7bffff' }]
-    },
-    {
-      featureType: 'landscape',
-      elementType: 'geometry',
-      stylers: [{ color: '#ffffffff' }]
-    }
-  ];
-  
-  mapOptions: google.maps.MapOptions = {
-    mapTypeId: 'roadmap',
-    styles: this.defaultMapStyle,
-    mapTypeControl: true,
-    streetViewControl: true,
-    fullscreenControl: true,
-    zoomControl: true
-  };
+  mapOptions: google.maps.MapOptions = DEFAULT_MAP_OPTIONS;
 
   constructor(private configService: ConfigService) {}
   
   ngOnInit() {
     this.configService.getConfig().subscribe(config => {
       this.config = config;
+      this.transportOptions = getTransportOptions(config);
       this.loadGoogleMapsAPI();
     });
   }
@@ -556,7 +305,7 @@ export class GoogleMapComponent implements OnInit {
     this.clearAttractions();
     this.showingShops = true;
     
-    this.mapOptions = { ...this.mapOptions, styles: this.groceryStoreMapStyle };
+    this.mapOptions = { ...this.mapOptions, styles: MAP_STYLES.grocery };
     
     if (this.map && this.map.googleMap) {
       this.localShops.forEach(shop => {
@@ -633,7 +382,7 @@ export class GoogleMapComponent implements OnInit {
     this.showingTransport = true;
     this.transportFilter = 'all';
     
-    this.mapOptions = { ...this.mapOptions, styles: this.transportMapStyle };
+    this.mapOptions = { ...this.mapOptions, styles: MAP_STYLES.transport };
     
     this.createTransportMarkers();
     this.adjustMapView();

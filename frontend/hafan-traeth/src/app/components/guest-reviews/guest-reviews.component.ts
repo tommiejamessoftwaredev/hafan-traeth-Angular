@@ -1,23 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ConfigService, AppConfig } from '../../services/config.service';
+import { ConfigService } from '../../services/config.service';
+import { AppConfig } from '../../interfaces/config.interface';
+import { Review, RatingCategory } from '../../interfaces/review.interface';
 
-interface Review {
-  name: string;
-  location: string;
-  rating: number;
-  title: string;
-  text: string;
-  date: Date;
-  avatar?: string;
-  expanded?: boolean;
-  highlights?: { icon: string; text: string; }[];
-}
-
-interface RatingCategory {
-  name: string;
-  score: number;
-}
 
 @Component({
   selector: 'app-guest-reviews',

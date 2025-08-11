@@ -1,0 +1,12 @@
+export const MAP_CONFIG = {
+  CENTER: { lat: 53.33336569521891, lng: -3.431334999915092 },
+  ZOOM: 15,
+  MARKER_POSITION: { lat: 53.33336569521891, lng: -3.431334999915092 },
+  BEACH_LOCATION: {
+    lat: 53.33727314564057,
+    lng: -3.432135755118875
+  },
+  MARKER_OPTIONS: {
+    draggable: false
+  }
+};
