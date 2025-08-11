@@ -12,11 +12,16 @@ import { environment } from '../../../environments/environment';
 export class GoogleMapComponent implements OnInit {
   @ViewChild(GoogleMap) map!: GoogleMap;
   
+  // Make environment available in template
+  environment = environment;
+  
   mapLoaded = false;
   mapType: 'roadmap' | 'satellite' = 'roadmap';
   showFallback = false;
   showingDirections = false;
   showingShops = false;
+  showingTransport = false;
+  transportFilter: 'all' | 'bus' | 'train' = 'all';
   
   // Directions
   directionsService: google.maps.DirectionsService | null = null;
@@ -25,6 +30,8 @@ export class GoogleMapComponent implements OnInit {
   directionsInfoWindow: google.maps.InfoWindow | null = null;
   shopsMarkers: google.maps.Marker[] = [];
   shopsInfoWindows: google.maps.InfoWindow[] = [];
+  transportMarkers: google.maps.Marker[] = [];
+  transportInfoWindows: google.maps.InfoWindow[] = [];
   
   // Map configuration
   center: google.maps.LatLngLiteral = { lat: 53.33336569521891, lng: -3.431334999915092 };
@@ -83,6 +90,56 @@ export class GoogleMapComponent implements OnInit {
     }
   ];
   
+  // Transport options with exact coordinates
+  transportOptions = [
+    {
+      name: 'Prestatyn Railway Station',
+      location: { lat: 53.336151690290315, lng: -3.4074164897070847 },
+      type: 'train_station',
+      description: 'Direct services from Chester & Holyhead',
+      icon: 'T',
+      links: []
+    },
+    {
+      name: 'Brig-Y-Don (Route 36 to Rhyl)',
+      location: { lat: 53.3325831939434, lng: -3.434729270045932 },
+      type: 'bus_station',
+      description: 'Bus Route 36 - Rhyl Circular service',
+      icon: '36',
+      links: [
+        {
+          text: 'View Route 36 Timetable',
+          url: environment.busRoute36PdfUrl,
+          type: 'pdf'
+        },
+        {
+          text: 'Route 36 Journey Planner',
+          url: environment.busRoute36PlannerUrl,
+          type: 'external'
+        }
+      ]
+    },
+    {
+      name: 'Brig-Y-Don (Route 35 to Town)',
+      location: { lat: 53.33263781742478, lng: -3.4350447197400875 },
+      type: 'bus_station',
+      description: 'Bus Route 35 - Rhyl Circular to Prestatyn town center',
+      icon: '35',
+      links: [
+        {
+          text: 'View Route 35 Timetable',
+          url: environment.busRoute35PdfUrl,
+          type: 'pdf'
+        },
+        {
+          text: 'Route 35 Journey Planner',
+          url: environment.busRoute35PlannerUrl,
+          type: 'external'
+        }
+      ]
+    }
+  ];
+  
   // Map styles to hide all POIs when showing custom shop markers
   private readonly groceryStoreMapStyle = [
     // Hide all POI labels so we can show our custom shop markers
@@ -105,6 +162,35 @@ export class GoogleMapComponent implements OnInit {
       elementType: 'labels',
       stylers: [{ visibility: 'on' }]
     }
+  ];
+  
+  // Map styles for transport view
+  private readonly transportMapStyle = [
+    // Hide all POI labels so we can show our custom transport markers
+    {
+      featureType: 'poi',
+      stylers: [{ visibility: 'off' }]
+    },
+    // Keep natural terrain colors and styling
+    // {
+    //   featureType: 'water',
+    //   elementType: 'geometry',
+    //   stylers: [{ color: '#667eea' }]
+    // },
+    {
+      featureType: 'landscape',
+      elementType: 'geometry',
+      stylers: [{ color: '#ffffffff' }]
+    },
+    // {
+    //   featureType: 'road',
+    //   stylers: [{ visibility: 'simplified' }]
+    // },
+    // {
+    //   featureType: 'administrative',
+    //   elementType: 'labels',
+    //   stylers: [{ visibility: 'on' }]
+    // }
   ];
   
   private readonly defaultMapStyle = [
@@ -203,8 +289,10 @@ export class GoogleMapComponent implements OnInit {
   }
   
   openDirections() {
-    // Use embedded map directions instead of opening new tab
-    this.showBeachDirections();
+    // Open Google Maps with directions from user's current location
+    const destination = `${this.markerPosition.lat},${this.markerPosition.lng}`;
+    const url = `https://www.google.com/maps/dir//10+Ceri+Ave,+Prestatyn+LL19+7YN,+UK/@${destination}`;
+    window.open(url, '_blank');
   }
   
   showBeachDirections() {
@@ -227,6 +315,7 @@ export class GoogleMapComponent implements OnInit {
     }
 
     this.clearShops();
+    this.clearTransport();
     
     if (!this.directionsService || !this.directionsRenderer) {
       console.error('Directions service not initialized - trying to initialize now');
@@ -374,6 +463,7 @@ export class GoogleMapComponent implements OnInit {
     if (this.showFallback) return;
     
     this.clearDirections();
+    this.clearTransport();
     this.showingShops = true;
     
     // Apply styling to hide all POI labels
@@ -446,6 +536,155 @@ export class GoogleMapComponent implements OnInit {
     this.zoom = 15;
   }
   
+  showLocalTransport() {
+    if (this.showingTransport) {
+      // If already showing transport, clear them
+      this.clearTransport();
+      return;
+    }
+    
+    if (this.showFallback) return;
+    
+    this.clearDirections();
+    this.clearShops();
+    this.showingTransport = true;
+    this.transportFilter = 'all';
+    
+    // Apply styling to hide all POI labels
+    this.mapOptions = { ...this.mapOptions, styles: this.transportMapStyle };
+    
+    // Create markers and adjust view
+    this.createTransportMarkers();
+    this.adjustMapView();
+  }
+  
+  filterTransport(filter: 'all' | 'bus' | 'train') {
+    this.transportFilter = filter;
+    if (this.showingTransport) {
+      this.clearTransportMarkers();
+      this.createTransportMarkers();
+      this.adjustMapView();
+    }
+  }
+  
+  private clearTransportMarkers() {
+    // Clear custom transport markers
+    this.transportMarkers.forEach(marker => {
+      marker.setMap(null);
+    });
+    this.transportMarkers = [];
+    
+    // Close all transport info windows
+    this.transportInfoWindows.forEach(infoWindow => {
+      infoWindow.close();
+    });
+    this.transportInfoWindows = [];
+  }
+  
+  private createTransportMarkers() {
+    if (!this.map || !this.map.googleMap) return;
+    
+    const filteredTransport = this.transportOptions.filter(transport => {
+      if (this.transportFilter === 'all') return true;
+      if (this.transportFilter === 'bus') return transport.type === 'bus_station';
+      if (this.transportFilter === 'train') return transport.type === 'train_station';
+      return false;
+    });
+
+    filteredTransport.forEach(transport => {
+      const labelWidth = transport.name.length * 7 + 20;
+      const iconColor = transport.type === 'train_station' ? '#1976D2' : '#8E24AA';
+      
+      const marker = new google.maps.Marker({
+        position: transport.location,
+        map: this.map.googleMap,
+        title: transport.name,
+        icon: {
+          url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" width="${labelWidth + 10}" height="50" viewBox="0 0 ${labelWidth + 10} 50">
+              <!-- Label background -->
+              <rect x="5" y="5" width="${labelWidth}" height="18" rx="9" fill="white" stroke="${iconColor}" stroke-width="1"/>
+              <!-- Label text -->
+              <text x="${(labelWidth + 10) / 2}" y="16" text-anchor="middle" fill="${iconColor}" font-family="Arial, sans-serif" font-size="11" font-weight="bold">${transport.name}</text>
+              <!-- Marker circle -->
+              <circle cx="${(labelWidth + 10) / 2}" cy="37" r="10" fill="${iconColor}" stroke="white" stroke-width="2"/>
+              <!-- Marker text -->
+              <text x="${(labelWidth + 10) / 2}" y="41" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="9" font-weight="bold">${transport.icon}</text>
+            </svg>
+          `),
+          scaledSize: new google.maps.Size(labelWidth + 10, 50),
+          anchor: new google.maps.Point((labelWidth + 10) / 2, 47)
+        }
+      });
+      
+      // Add info window for each transport option
+      const linksHtml = transport.links?.map(link => 
+        `<a href="${link.url}" target="${link.type === 'external' ? '_blank' : '_self'}" 
+           style="display: inline-block; margin: 2px 4px 2px 0; padding: 4px 8px; 
+                  background: ${iconColor}; color: white; text-decoration: none; 
+                  border-radius: 4px; font-size: 11px;">
+           <i class="fas ${link.type === 'pdf' ? 'fa-file-pdf' : 'fa-external-link-alt'}"></i> ${link.text}
+         </a>`
+      ).join('') || '';
+
+      const infoWindow = new google.maps.InfoWindow({
+        content: `
+          <div style="padding: 8px; font-family: Arial, sans-serif; min-width: 200px;">
+            <h4 style="margin: 0 0 4px 0; color: ${iconColor};">${transport.name}</h4>
+            <p style="margin: 0 0 8px 0; font-size: 12px; color: #666;">${transport.description}</p>
+            ${linksHtml ? `<div style="margin-top: 8px;">${linksHtml}</div>` : ''}
+          </div>
+        `
+      });
+      
+      marker.addListener('click', () => {
+        // Close any open info windows
+        this.transportInfoWindows.forEach(iw => iw.close());
+        infoWindow.open(this.map.googleMap, marker);
+      });
+      
+      this.transportMarkers.push(marker);
+      this.transportInfoWindows.push(infoWindow);
+    });
+  }
+  
+  private adjustMapView() {
+    const filteredTransport = this.transportOptions.filter(transport => {
+      if (this.transportFilter === 'all') return true;
+      if (this.transportFilter === 'bus') return transport.type === 'bus_station';
+      if (this.transportFilter === 'train') return transport.type === 'train_station';
+      return false;
+    });
+
+    // Calculate bounds that include BnB and filtered transport options
+    const allLocations = [this.markerPosition, ...filteredTransport.map(transport => transport.location)];
+    const latitudes = allLocations.map(loc => loc.lat);
+    const longitudes = allLocations.map(loc => loc.lng);
+    
+    const minLat = Math.min(...latitudes);
+    const maxLat = Math.max(...latitudes);
+    const minLng = Math.min(...longitudes);
+    const maxLng = Math.max(...longitudes);
+    
+    // Center between all locations
+    const centerLat = (minLat + maxLat) / 2;
+    const centerLng = (minLng + maxLng) / 2;
+    
+    this.center = { lat: centerLat, lng: centerLng };
+    
+    // Zoom in more for bus stops since they're close together
+    this.zoom = this.transportFilter === 'bus' ? 17 : 15;
+  }
+  
+  clearTransport() {
+    this.clearTransportMarkers();
+    this.showingTransport = false;
+    this.transportFilter = 'all';
+    // Reset map styling to default
+    this.mapOptions = { ...this.mapOptions, styles: this.defaultMapStyle };
+    this.resetMapView();
+  }
+  
   clearDirections() {
     // Clear the directions route
     if (this.directionsRenderer) {
@@ -488,7 +727,7 @@ export class GoogleMapComponent implements OnInit {
   }
   
   private resetMapView() {
-    if (!this.showingDirections && !this.showingShops) {
+    if (!this.showingDirections && !this.showingShops && !this.showingTransport) {
       this.center = this.markerPosition;
       this.zoom = 15;
       

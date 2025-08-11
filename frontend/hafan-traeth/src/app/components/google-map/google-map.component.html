@@ -5,6 +5,61 @@
     <p>🔗 What3Words: ///funny.cherub.hospitals</p>
   </div>
   
+  <!-- Transport Filter Section (shown when transport is active) -->
+  <div *ngIf="showingTransport" class="transport-filters">
+    <div class="filter-buttons">
+      <button 
+        class="filter-btn" 
+        [class.active]="transportFilter === 'all'"
+        (click)="filterTransport('all')">
+        <i class="fas fa-globe"></i> All Transport
+      </button>
+      <button 
+        class="filter-btn" 
+        [class.active]="transportFilter === 'bus'"
+        (click)="filterTransport('bus')">
+        <i class="fas fa-bus"></i> Bus Routes
+      </button>
+      <button 
+        class="filter-btn" 
+        [class.active]="transportFilter === 'train'"
+        (click)="filterTransport('train')">
+        <i class="fas fa-train"></i> Train Station
+      </button>
+    </div>
+    
+    <!-- Transport Information -->
+    <div class="transport-info" *ngIf="transportFilter === 'bus' || transportFilter === 'all'">
+      <h5><i class="fas fa-bus"></i> Bus Services</h5>
+      <div class="bus-routes">
+        <div class="bus-route">
+          <strong>Route 35 - Prestatyn Town Centre</strong>
+          <p>Every 30 minutes • Circular route via town center</p>
+          <div class="route-links">
+            <a [href]="environment.busRoute35PdfUrl" target="_blank" class="route-link pdf">
+              <i class="fas fa-file-pdf"></i> Timetable
+            </a>
+            <a [href]="environment.busRoute35PlannerUrl" target="_blank" class="route-link external">
+              <i class="fas fa-external-link-alt"></i> Journey Planner
+            </a>
+          </div>
+        </div>
+        <div class="bus-route">
+          <strong>Route 36 - Rhyl</strong>
+          <p>Every 30 minutes • Circular route to Rhyl</p>
+          <div class="route-links">
+            <a [href]="environment.busRoute36PdfUrl" target="_blank" class="route-link pdf">
+              <i class="fas fa-file-pdf"></i> Timetable
+            </a>
+            <a [href]="environment.busRoute36PlannerUrl" target="_blank" class="route-link external">
+              <i class="fas fa-external-link-alt"></i> Journey Planner
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="map-container">
     <!-- Google Maps Angular Component -->
     <div *ngIf="!showFallback && mapLoaded" class="interactive-map">
@@ -90,11 +145,12 @@
         </div>
       </div>
       
-      <div class="feature-item">
+      <div class="feature-item clickable" [class.active]="showingTransport" (click)="showLocalTransport()">
         <span class="icon"><i class="fas fa-bus"></i></span>
         <div class="feature-text">
           <h5>Public Transport</h5>
           <p>Bus routes to Rhyl and Chester</p>
+          <small class="directions-hint">{{ showingTransport ? 'Click to hide transport options' : 'Click to show transport options' }}</small>
         </div>
       </div>
     </div>
