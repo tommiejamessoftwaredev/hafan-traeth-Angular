@@ -56,7 +56,7 @@ export const ATTRACTION_CATEGORIES: AttractionCategory[] = [
         type: 'castle',
         description: '13th-century castle ruins with rich Welsh history',
         icon: 'castle',
-        links: [{ url: 'https://cadw.gov.wales/visit/places-to-visit/rhuddlan-castle', text: 'Visit Info', type: 'external' }],
+        links: [{ url: 'https://cadw.gov.wales/visit/places-to-visit/rhuddlan-castle', text: 'Visit Info', type: 'external', icon: 'fas fa-external-link-alt' }],
         website: 'https://cadw.gov.wales/visit/places-to-visit/rhuddlan-castle'
       },
       {
@@ -65,7 +65,7 @@ export const ATTRACTION_CATEGORIES: AttractionCategory[] = [
         type: 'castle',
         description: 'Victorian castle with art galleries and parkland',
         icon: 'castle',
-        links: [{ url: 'https://www.warnerhotels.co.uk/hotels/bodelwyddan-castle-hotel', text: 'Official Site', type: 'external' }],
+        links: [{ url: 'https://www.warnerhotels.co.uk/hotels/bodelwyddan-castle-hotel', text: 'Official Site', type: 'external', icon: 'fas fa-external-link-alt' }],
         website: 'https://www.warnerhotels.co.uk/hotels/bodelwyddan-castle-hotel'
       },
       {
@@ -74,7 +74,7 @@ export const ATTRACTION_CATEGORIES: AttractionCategory[] = [
         type: 'castle',
         description: 'Spectacular 19th-century castle, home to I\'m A Celebrity',
         icon: 'castle',
-        links: [{ url: 'https://www.gwrychcastle.co.uk/', text: 'Official Site', type: 'external' }],
+        links: [{ url: 'https://www.gwrychcastle.co.uk/', text: 'Official Site', type: 'external', icon: 'fas fa-external-link-alt' }],
         website: 'https://www.gwrychcastle.co.uk/'
       }
     ]
@@ -111,7 +111,7 @@ export const ATTRACTION_CATEGORIES: AttractionCategory[] = [
         type: 'golf_course',
         description: '18-hole championship golf course',
         icon: 'golf',
-        links: [{ url: 'https://prestatyngolfclub.co.uk/visitors.html', text: 'Visit Info', type: 'external' }],
+        links: [{ url: 'https://prestatyngolfclub.co.uk/visitors.html', text: 'Visit Info', type: 'external', icon: 'fas fa-golf-ball' }],
         website: 'https://prestatyngolfclub.co.uk/visitors.html'
       },
       {
@@ -150,7 +150,7 @@ export const ATTRACTION_CATEGORIES: AttractionCategory[] = [
         type: 'amusement_park',
         description: 'Large waterpark and leisure complex',
         icon: 'waterpark',
-        links: [{ url: 'https://sc2rhyl.co.uk/', text: 'Book Tickets', type: 'external' }],
+        links: [{ url: 'https://sc2rhyl.co.uk/', text: 'Book Tickets', type: 'external', icon: 'fas fa-swimmer' }],
         website: 'https://sc2rhyl.co.uk/'
       },
       {
@@ -159,7 +159,7 @@ export const ATTRACTION_CATEGORIES: AttractionCategory[] = [
         type: 'movie_theater',
         description: 'Local cinema showing latest films',
         icon: 'cinema',
-        links: [{ url: 'https://www.merlincinemas.co.uk/', text: 'View Films', type: 'external' }],
+        links: [{ url: 'https://www.merlincinemas.co.uk/', text: 'View Films', type: 'external', icon: 'fas fa-film' }],
         website: 'https://www.merlincinemas.co.uk/'
       },
       {
@@ -168,7 +168,7 @@ export const ATTRACTION_CATEGORIES: AttractionCategory[] = [
         type: 'performing_arts_theater',
         description: 'Historic theatre with live performances',
         icon: 'theatre',
-        links: [{ url: 'https://rhylpavilion.co.uk/', text: 'Show Times', type: 'external' }],
+        links: [{ url: 'https://rhylpavilion.co.uk/', text: 'Show Times', type: 'external', icon: 'fas fa-theater-masks' }],
         website: 'https://rhylpavilion.co.uk/'
       }
     ]

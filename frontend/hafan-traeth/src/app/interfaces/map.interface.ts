@@ -12,6 +12,7 @@ export interface MapLocationLink {
   text: string;
   url: string | undefined;
   type: 'pdf' | 'external';
+  icon?: string;
 }
 
 export interface AttractionCategory {

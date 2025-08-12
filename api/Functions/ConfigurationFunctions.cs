@@ -1,5 +1,7 @@
 using System.Net;
-using System.Text.Json;
+using HafanTraethApi.Exceptions;
+using HafanTraethApi.Extensions;
+using HafanTraethApi.Services.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
@@ -8,11 +10,16 @@ namespace HafanTraethApi.Functions
 {
     public class ConfigurationFunctions
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<ConfigurationFunctions> _logger;
+        private readonly IConfigurationService _configurationService;
 
-        public ConfigurationFunctions(ILoggerFactory loggerFactory)
+        public ConfigurationFunctions(
+            ILogger<ConfigurationFunctions> logger,
+            IConfigurationService configurationService
+        )
         {
-            _logger = loggerFactory.CreateLogger<ConfigurationFunctions>();
+            _logger = logger;
+            _configurationService = configurationService;
         }
 
         [Function("GetConfiguration")]
@@ -20,68 +27,36 @@ namespace HafanTraethApi.Functions
             [HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req
         )
         {
-            _logger.LogInformation("Getting application configuration");
+            _logger.LogInformation("Processing GetConfiguration request");
+
+            var response = req.CreateResponse();
+            response.AddCorsHeaders();
 
             try
             {
-                var config = new
-                {
-                    googleMapsApiKey = Environment.GetEnvironmentVariable("GOOGLE_MAPS_API_KEY")
-                        ?? "",
-                    apiUrl = Environment.GetEnvironmentVariable("API_BASE_URL")
-                        ?? req.Url.GetLeftPart(UriPartial.Authority) + "/api",
-                    bookingComUrl = Environment.GetEnvironmentVariable("BOOKING_COM_URL")
-                        ?? "https://www.booking.com/hotel/gb/hafan-traeth.en-gb.html",
-                    bookingComReviewsUrl = Environment.GetEnvironmentVariable(
-                        "BOOKING_COM_REVIEWS_URL"
-                    ) ?? "https://www.booking.com/hotel/gb/hafan-traeth.en-gb.html#tab-reviews",
-                    airbnbUrl = Environment.GetEnvironmentVariable("AIRBNB_URL")
-                        ?? "https://www.airbnb.co.uk/rooms/920441523710400719",
-                    airbnbReviewsUrl = Environment.GetEnvironmentVariable("AIRBNB_REVIEWS_URL")
-                        ?? "https://www.airbnb.co.uk/rooms/920441523710400719/reviews",
-                    icalUrl = Environment.GetEnvironmentVariable("ICAL_URL")
-                        ?? "https://ical.booking.com/v1/export?t=32f37ade-b2ed-48b9-9e49-573b6dcc4660",
-                    busRoute35PdfUrl = Environment.GetEnvironmentVariable("BUS_ROUTE_35_PDF_URL")
-                        ?? "/36-Rhyl-Circular-from-26-Jan-2025.pdf",
-                    busRoute36PdfUrl = Environment.GetEnvironmentVariable("BUS_ROUTE_36_PDF_URL")
-                        ?? "/35-Rhyl-Circular-from-26-Jan-2025.pdf",
-                    busRoute35PlannerUrl = Environment.GetEnvironmentVariable(
-                        "BUS_ROUTE_35_PLANNER_URL"
-                    ) ?? "https://www.arrivabus.co.uk/find-a-service/35-rhyl-circular",
-                    busRoute36PlannerUrl = Environment.GetEnvironmentVariable(
-                        "BUS_ROUTE_36_PLANNER_URL"
-                    ) ?? "https://www.arrivabus.co.uk/find-a-service/36-rhyl-circular",
-                };
+                var baseUrl = req.Url.GetLeftPart(UriPartial.Authority) + "/api";
+                var config = await _configurationService.GetConfigurationAsync(baseUrl);
 
-                var response = req.CreateResponse(HttpStatusCode.OK);
-                response.Headers.Add("Content-Type", "application/json; charset=utf-8");
+                response.StatusCode = HttpStatusCode.OK;
+                await response.WriteJsonAsync(config);
 
-                // Add CORS headers for frontend access
-                response.Headers.Add("Access-Control-Allow-Origin", "*");
-                response.Headers.Add("Access-Control-Allow-Methods", "GET, OPTIONS");
-                response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
-
-                await response.WriteStringAsync(
-                    JsonSerializer.Serialize(
-                        config,
-                        new JsonSerializerOptions
-                        {
-                            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                        }
-                    )
-                );
-
+                _logger.LogInformation("Configuration retrieved successfully");
+                return response;
+            }
+            catch (HafanTraethApiException ex)
+            {
+                _logger.LogError(ex, "Business logic error in GetConfiguration");
+                await response.WriteErrorAsync(ex);
                 return response;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting configuration");
-
-                var errorResponse = req.CreateResponse(HttpStatusCode.InternalServerError);
-                await errorResponse.WriteStringAsync(
-                    JsonSerializer.Serialize(new { error = "Failed to load configuration" })
+                _logger.LogError(ex, "Unexpected error in GetConfiguration");
+                await response.WriteErrorAsync(
+                    "An unexpected error occurred",
+                    HttpStatusCode.InternalServerError
                 );
-                return errorResponse;
+                return response;
             }
         }
 
@@ -90,13 +65,10 @@ namespace HafanTraethApi.Functions
             [HttpTrigger(AuthorizationLevel.Anonymous, "options")] HttpRequestData req
         )
         {
-            var response = req.CreateResponse(HttpStatusCode.OK);
+            _logger.LogInformation("Processing CORS preflight request for Configuration");
 
-            // CORS preflight response
-            response.Headers.Add("Access-Control-Allow-Origin", "*");
-            response.Headers.Add("Access-Control-Allow-Methods", "GET, OPTIONS");
-            response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
-            response.Headers.Add("Access-Control-Max-Age", "86400");
+            var response = req.CreateResponse(HttpStatusCode.OK);
+            response.AddCorsPreflightHeaders();
 
             return response;
         }

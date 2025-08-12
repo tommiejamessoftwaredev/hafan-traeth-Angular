@@ -503,7 +503,7 @@ export class GoogleMapComponent implements OnInit {
     this.clearTransportMarkers();
     this.showingTransport = false;
     this.transportFilter = 'all';
-    this.mapOptions = { ...this.mapOptions, styles: this.defaultMapStyle };
+    this.mapOptions = { ...this.mapOptions, styles: MAP_STYLES.default };
     this.resetMapView();
   }
   
@@ -538,7 +538,7 @@ export class GoogleMapComponent implements OnInit {
     this.shopsInfoWindows = [];
     
     this.showingShops = false;
-    this.mapOptions = { ...this.mapOptions, styles: this.defaultMapStyle };
+    this.mapOptions = { ...this.mapOptions, styles: MAP_STYLES.default };
     this.resetMapView();
   }
   
