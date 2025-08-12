@@ -179,10 +179,10 @@ export class PropertyGalleryComponent implements OnInit {
   ];
   
   categories: Category[] = [
-    { key: 'all', name: 'All Photos', icon: '📷', count: 0 },
-    { key: 'interior', name: 'Interior', icon: '🏠', count: 0 },
-    { key: 'exterior', name: 'Exterior', icon: '🌳', count: 0 },
-    { key: 'views', name: 'Views', icon: '🌅', count: 0 }
+    { key: 'all', name: 'All Photos', icon: 'fas fa-camera', count: 0 },
+    { key: 'interior', name: 'Interior', icon: 'fas fa-home', count: 0 },
+    { key: 'exterior', name: 'Exterior', icon: 'fas fa-tree', count: 0 },
+    { key: 'views', name: 'Views', icon: 'fas fa-mountain', count: 0 }
   ];
   
   filteredImages: GalleryImage[] = [];

@@ -17,7 +17,7 @@
         <p>{{ selectedImage.description }}</p>
       </div>
       <button class="fullscreen-btn" (click)="openLightbox(selectedImage)">
-        🔍 View Full Size
+        <i class="fas fa-search-plus"></i> View Full Size
       </button>
     </div>
   </div>
@@ -25,7 +25,7 @@
   <div class="gallery-thumbnails">
     <div class="thumbnail-grid">
       <div 
-        *ngFor="let image of galleryImages; let i = index"
+        *ngFor="let image of filteredImages; let i = index"
         class="thumbnail"
         [class.active]="image === selectedImage"
         (click)="selectImage(image)">
@@ -48,7 +48,7 @@
         class="category-btn"
         [class.active]="selectedCategory === category.key"
         (click)="filterByCategory(category.key)">
-        {{ category.icon }} {{ category.name }} ({{ category.count }})
+        <i [class]="category.icon"></i> {{ category.name }} ({{ category.count }})
       </button>
     </div>
   </div>
