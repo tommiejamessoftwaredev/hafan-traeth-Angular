@@ -3,5 +3,12 @@
     "azureFunctions.projectLanguage": "C#",
     "azureFunctions.projectRuntime": "~4",
     "debug.internalConsoleOptions": "neverOpen",
-    "azureFunctions.preDeployTask": "publish (functions)"
+    "azureFunctions.preDeployTask": "publish (functions)",
+    "dotnet.defaultSolution": "disable",
+    "dotnet-test-explorer.testProjectPath": "**/*Tests.csproj",
+    "dotnet-test-explorer.useTreeView": true,
+    "dotnet-test-explorer.showCodeLens": true,
+    "dotnet-test-explorer.codeLensFailed": "❌",
+    "dotnet-test-explorer.codeLensPassed": "✅",
+    "dotnet-test-explorer.codeLensSkipped": "⚠️"
 }
