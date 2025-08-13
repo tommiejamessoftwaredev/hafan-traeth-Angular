@@ -17,7 +17,12 @@
     <div class="rating-categories">
       <div class="category" *ngFor="let category of ratingCategories">
         <span class="category-name">{{ category.name }}</span>
-        <span class="category-score">{{ category.score.toFixed(1) }}</span>
+        <div class="category-rating">
+          <div class="category-stars">
+            <i class="star small" *ngFor="let star of getStarsArray(category.score)" [ngClass]="[star.class, star.icon]"></i>
+          </div>
+          <span class="category-score">{{ category.score.toFixed(1) }}</span>
+        </div>
       </div>
     </div>
   </div>

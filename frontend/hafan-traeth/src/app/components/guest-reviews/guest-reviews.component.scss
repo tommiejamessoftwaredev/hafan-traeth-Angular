@@ -69,6 +69,76 @@
   opacity: 0.9;
 }
 
+// Rating Categories Section
+.rating-categories {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.category {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: #f8f9fa;
+    border-color: #cbd5e0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .category-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+  
+  .category-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .category-stars {
+    display: flex;
+    gap: 2px;
+    
+    .star.small {
+      font-size: 0.75rem;
+      color: #ffd700;
+      
+      &.full {
+        color: #ffd700;
+      }
+      
+      &.half {
+        color: #ffd700;
+      }
+      
+      &.empty {
+        color: #e0e0e0;
+      }
+    }
+  }
+  
+  .category-score {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+}
+
 // Reviews Grid
 .reviews-grid {
   display: grid;
@@ -325,6 +395,28 @@
     text-align: center;
   }
   
+  .rating-categories {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+    margin-top: 1.5rem;
+  }
+  
+  .category {
+    padding: 0.5rem 0.75rem;
+    
+    .category-name {
+      font-size: 0.85rem;
+    }
+    
+    .category-score {
+      font-size: 0.85rem;
+    }
+    
+    .category-stars .star.small {
+      font-size: 0.7rem;
+    }
+  }
+  
   .reviews-grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
@@ -383,5 +475,26 @@
   
   .reviews-header h2 {
     font-size: 1.75rem;
+  }
+  
+  .rating-categories {
+    padding: 0.75rem;
+    margin-top: 1rem;
+  }
+  
+  .category {
+    padding: 0.5rem;
+    
+    .category-name {
+      font-size: 0.8rem;
+    }
+    
+    .category-score {
+      font-size: 0.8rem;
+    }
+    
+    .category-stars .star.small {
+      font-size: 0.65rem;
+    }
   }
 }
