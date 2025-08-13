@@ -3,7 +3,7 @@
 A modern, responsive Angular application with a .net azure functions backend, showcasing a holiday property rental business in North Wales.
 
 ## Live Demo
-*[Add your deployed application URL here]*
+🌐 **[https://www.hafantraeth.com/](https://www.hafantraeth.com/)**
 
 ## Project Overview
 
