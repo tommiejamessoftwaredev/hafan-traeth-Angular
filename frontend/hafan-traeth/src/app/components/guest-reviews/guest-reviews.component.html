@@ -10,7 +10,15 @@
         </div>
         <span class="rating-text">Exceptional</span>
       </div>
-      <p class="review-count">Based on {{ reviews.length }} reviews</p>
+      <p class="review-count">Based on {{ reviews.length }} recent reviews</p>
+    </div>
+    
+    <!-- Rating Categories -->
+    <div class="rating-categories">
+      <div class="category" *ngFor="let category of ratingCategories">
+        <span class="category-name">{{ category.name }}</span>
+        <span class="category-score">{{ category.score.toFixed(1) }}</span>
+      </div>
     </div>
   </div>
 

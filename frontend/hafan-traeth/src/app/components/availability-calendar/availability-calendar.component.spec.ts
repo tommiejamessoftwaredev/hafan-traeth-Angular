@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AvailabilityCalendarComponent } from './availability-calendar.component';
 
 describe('AvailabilityCalendarComponent', () => {
@@ -8,7 +8,7 @@ describe('AvailabilityCalendarComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AvailabilityCalendarComponent]
+      imports: [AvailabilityCalendarComponent, HttpClientTestingModule]
     })
     .compileComponents();
 

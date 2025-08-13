@@ -10,5 +10,15 @@
     "dotnet-test-explorer.showCodeLens": true,
     "dotnet-test-explorer.codeLensFailed": "❌",
     "dotnet-test-explorer.codeLensPassed": "✅",
-    "dotnet-test-explorer.codeLensSkipped": "⚠️"
+    "dotnet-test-explorer.codeLensSkipped": "⚠️",
+    "jestTestExplorer.jestCommand": "npm test",
+    "jestTestExplorer.rootPath": "./frontend/hafan-traeth",
+    "jestTestExplorer.testNamePattern": ".*\\.spec\\.ts$",
+    "jestTestExplorer.showCoverageOnLoad": false,
+    "testExplorer.useNativeTesting": true,
+    "testExplorer.gutterDecoration": true,
+    "testExplorer.codeLens": true,
+    "testExplorer.showCollapseButton": true,
+    "testExplorer.showExpandButton": true,
+    "testExplorer.showOnRun": true
 }
