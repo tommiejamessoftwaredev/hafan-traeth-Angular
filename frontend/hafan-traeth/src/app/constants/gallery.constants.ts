@@ -42,7 +42,7 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     title: 'Garden',
     description: 'Private garden space for outdoor relaxation',
     url: 'img/GalleryImages/5.JPG',
-    thumbnail: 'img/GalleryImages/5.jpg',
+    thumbnail: 'img/GalleryImages/5.JPG',
     alt: 'Peaceful garden area',
     category: 'exterior'
   },
@@ -140,7 +140,7 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     id: 17,
     title: 'Garden Eating Area',
     description: 'Outdoor dining space in the garden',
-    url: 'img/GalleryImages/17.jpg',
+    url: 'img/GalleryImages/17.JPG',
     thumbnail: 'img/GalleryImages/17.JPG',
     alt: 'Garden dining area',
     category: 'exterior'
