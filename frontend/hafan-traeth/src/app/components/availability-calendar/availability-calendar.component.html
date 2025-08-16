@@ -31,9 +31,13 @@
   <div class="calendar-display" *ngIf="showCalendar">
     <div class="calendar-month">
       <div class="calendar-nav">
-        <button (click)="previousMonth()" class="nav-btn">&lt;</button>
+        <button (click)="previousMonth()" class="nav-btn">
+          <i class="fas fa-chevron-left"></i>
+        </button>
         <h4>{{ currentMonth }} {{ currentYear }}</h4>
-        <button (click)="nextMonth()" class="nav-btn">&gt;</button>
+        <button (click)="nextMonth()" class="nav-btn">
+          <i class="fas fa-chevron-right"></i>
+        </button>
       </div>
       
       <div class="calendar-grid">
